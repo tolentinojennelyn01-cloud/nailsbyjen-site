@@ -390,15 +390,19 @@
             <p class="text-xs text-gray-400 mt-4" x-show="form.serviceLocation === 'home_service'">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
 
             <div class="mt-6 space-y-3">
-                <a :href="messengerLink" target="_blank"
-                   class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    Send via Messenger
-                </a>
-                <button type="button" @click="copySummary" class="block w-full border-2 border-rose-300 text-rose-600 font-medium tracking-wide text-sm rounded-xl py-3 hover:border-rose-400 transition-all">
-                    <span x-text="copied ? 'Copied!' : 'Copy booking details'"></span>
+                <button type="button" @click="downloadReceipt" class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    <span x-text="downloading ? 'Preparing image…' : '1. Download booking receipt'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Remember to also attach your reference photo directly in Messenger if you uploaded one.</p>
+                <a :href="messengerLink" target="_blank" @click="downloadReceipt"
+                   class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
+                    2. Open Messenger to send it
+                </a>
+                <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
+                    <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
+                </button>
+                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking to your device. Step 2 opens Messenger — attach that picture there (and your reference photo, if you uploaded one).</p>
             </div>
+            <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
@@ -470,6 +474,7 @@
                 pricing,
                 submitted: false,
                 copied: false,
+                downloading: false,
                 fileName: '',
                 form: {
                     customerName: '',
@@ -555,6 +560,193 @@
                         this.copied = true;
                         setTimeout(() => (this.copied = false), 2000);
                     });
+                },
+
+                buildReceiptRows() {
+                    const f = this.form;
+                    const rows = [];
+                    rows.push(['Name', f.customerName]);
+                    rows.push(['Contact', f.contactNumber]);
+                    if (f.fbName) rows.push(['Facebook name', f.fbName]);
+                    if (f.preferredDate) rows.push(['Preferred date', f.preferredDate]);
+                    if (f.preferredTime) rows.push(['Preferred time', f.preferredTime]);
+                    rows.push(['Location', f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base']);
+                    if (f.serviceAddress) rows.push(['Address', f.serviceAddress]);
+                    rows.push(['Base service', pricing.base_services[f.baseService]?.label || '']);
+                    if (f.nailLength) rows.push(['Nail length', f.nailLength]);
+                    if (f.nailShape) rows.push(['Nail shape', f.nailShape]);
+                    if (f.nailColor) rows.push(['Nail color', f.nailColor]);
+                    if (f.hasFullSetDesign && f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
+                    Object.entries(f.addons).filter(([, qty]) => qty > 0).forEach(([key, qty]) => {
+                        rows.push([pricing.addons[key]?.label, `× ${qty}`]);
+                    });
+                    if (f.removalOption) rows.push(['Removal', pricing.removal[f.removalOption]?.label]);
+                    if (f.notes) rows.push(['Notes', f.notes]);
+                    return rows;
+                },
+
+                wrapText(ctx, text, maxWidth) {
+                    const words = String(text).split(' ');
+                    const lines = [];
+                    let line = '';
+                    for (const word of words) {
+                        const test = line ? line + ' ' + word : word;
+                        if (ctx.measureText(test).width > maxWidth && line) {
+                            lines.push(line);
+                            line = word;
+                        } else {
+                            line = test;
+                        }
+                    }
+                    if (line) lines.push(line);
+                    return lines;
+                },
+
+                async drawReceipt() {
+                    const canvas = this.$refs.receiptCanvas;
+                    const ctx = canvas.getContext('2d');
+
+                    if (document.fonts && document.fonts.ready) {
+                        try {
+                            await document.fonts.load('600 40px "Playfair Display"');
+                            await document.fonts.load('40px "Alex Brush"');
+                            await document.fonts.load('600 16px "Jost"');
+                            await document.fonts.load('16px "Jost"');
+                            await document.fonts.ready;
+                        } catch (e) { /* fonts best-effort */ }
+                    }
+
+                    const rows = this.buildReceiptRows();
+                    const padding = 56;
+                    const width = 800;
+                    const rowLineHeight = 24;
+                    const rowGap = 14;
+
+                    // Measure total height first
+                    ctx.font = '16px Jost, sans-serif';
+                    let measuredHeight = 260; // header + total block
+                    rows.forEach(([label, value]) => {
+                        const lines = this.wrapText(ctx, value, width - padding * 2 - 220);
+                        measuredHeight += Math.max(lines.length, 1) * rowLineHeight + rowGap;
+                    });
+                    measuredHeight += 140; // total + footer
+
+                    canvas.width = width;
+                    canvas.height = measuredHeight;
+
+                    // Background
+                    ctx.fillStyle = '#fdf2f4';
+                    ctx.fillRect(0, 0, width, measuredHeight);
+                    const grad = ctx.createRadialGradient(width * 0.1, 0, 0, width * 0.1, 0, 500);
+                    grad.addColorStop(0, 'rgba(212,171,77,0.14)');
+                    grad.addColorStop(1, 'rgba(212,171,77,0)');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, width, measuredHeight);
+
+                    // Card
+                    const cardX = 24, cardY = 24, cardW = width - 48, cardH = measuredHeight - 48;
+                    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 24);
+                    ctx.fill();
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.lineWidth = 2;
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 24);
+                    ctx.stroke();
+
+                    let y = cardY + 70;
+                    const x = cardX + padding - 24;
+
+                    // Header script name
+                    ctx.textBaseline = 'alphabetic';
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '44px "Alex Brush", cursive';
+                    ctx.fillText('Jen Nail Artistry', x, y);
+
+                    y += 32;
+                    ctx.fillStyle = '#c2953a';
+                    ctx.font = '600 12px Jost, sans-serif';
+                    ctx.save();
+                    ctx.letterSpacing = '2px';
+                    ctx.fillText('BOOKING REQUEST', x, y);
+                    ctx.restore();
+
+                    y += 40;
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(cardX + cardW - padding + 24, y);
+                    ctx.stroke();
+
+                    y += 40;
+                    const labelX = x;
+                    const valueX = x + 210;
+                    const valueMaxWidth = cardW - padding * 2 - (valueX - x) + 24;
+
+                    rows.forEach(([label, value]) => {
+                        ctx.fillStyle = '#8a4d68';
+                        ctx.font = '15px Jost, sans-serif';
+                        ctx.fillText(label, labelX, y);
+
+                        ctx.fillStyle = '#391826';
+                        ctx.font = '600 15px Jost, sans-serif';
+                        const lines = this.wrapText(ctx, value, valueMaxWidth);
+                        lines.forEach((line, i) => {
+                            ctx.fillText(line, valueX, y + i * rowLineHeight);
+                        });
+                        y += Math.max(lines.length, 1) * rowLineHeight + rowGap;
+                    });
+
+                    y += 10;
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(cardX + cardW - padding + 24, y);
+                    ctx.stroke();
+
+                    y += 46;
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '600 26px "Playfair Display", serif';
+                    ctx.fillText('Estimated total', labelX, y);
+                    ctx.textAlign = 'right';
+                    ctx.fillText('₱' + this.total, cardX + cardW - padding + 24, y);
+                    ctx.textAlign = 'left';
+
+                    if (this.form.serviceLocation === 'home_service') {
+                        y += 26;
+                        ctx.fillStyle = '#8a4d68';
+                        ctx.font = 'italic 13px Jost, sans-serif';
+                        ctx.fillText('+ home service fee, to be confirmed by Jen', labelX, y);
+                    }
+
+                    y += 40;
+                    ctx.fillStyle = '#8a4d68';
+                    ctx.font = '12px Jost, sans-serif';
+                    ctx.fillText('Paliparan 2, Dasmariñas, Cavite  ·  @nailsbyjen.ph', labelX, y);
+
+                    return canvas;
+                },
+
+                roundRect(ctx, x, y, w, h, r) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.arcTo(x + w, y, x + w, y + h, r);
+                    ctx.arcTo(x + w, y + h, x, y + h, r);
+                    ctx.arcTo(x, y + h, x, y, r);
+                    ctx.arcTo(x, y, x + w, y, r);
+                    ctx.closePath();
+                },
+
+                async downloadReceipt() {
+                    this.downloading = true;
+                    try {
+                        const canvas = await this.drawReceipt();
+                        const link = document.createElement('a');
+                        link.download = `booking-${(this.form.customerName || 'request').replace(/\s+/g, '-').toLowerCase()}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    } finally {
+                        this.downloading = false;
+                    }
                 },
             };
         }

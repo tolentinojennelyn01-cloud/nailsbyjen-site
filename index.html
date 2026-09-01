@@ -80,11 +80,57 @@
                 <span class="font-script text-4xl leading-none bg-gradient-to-r from-rose-600 via-rose-500 to-gold-500 bg-clip-text text-transparent">Jen Nail Artistry</span>
                 <span class="text-[11px] uppercase tracking-[0.2em] text-gold-700/80 font-medium">Nailtech Beginner</span>
             </a>
-            <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="text-sm text-rose-500 hover:text-rose-600 transition-colors">@nailsbyjen.ph</a>
+            <nav class="flex items-center gap-4 text-sm">
+                <a href="#about" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">About</a>
+                <a href="#gallery" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Gallery</a>
+                <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="text-rose-500 hover:text-rose-600 transition-colors">@nailsbyjen.ph</a>
+            </nav>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-4 py-10" x-data="bookingPage()">
+
+        <!-- ============ ABOUT ============ -->
+        <section id="about" class="mb-14 text-center max-w-2xl mx-auto scroll-mt-24">
+            <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">A little about me</p>
+            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen 👋</h2>
+            <p class="text-sm sm:text-base text-plum-400 leading-relaxed">
+                I'm a nail artist based in Paliparan 2, Dasmariñas, Cavite, just getting my nail business off the ground.
+                I put care into every set — from soft, everyday gel looks to fuller nail art — and I'm always excited to
+                bring your ideas to life. Book a slot above and let's create something you'll love showing off.
+            </p>
+        </section>
+
+        <!-- ============ GALLERY ============ -->
+        <section id="gallery" class="mb-14 scroll-mt-24">
+            <div class="text-center mb-6">
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">See the work</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Gallery</h2>
+                <p class="text-sm text-plum-400 mt-2">More photos coming soon — check back for Jen's latest sets.</p>
+            </div>
+            <!-- To add more photos later: drop the image file into the images/ folder and add
+                 another entry to the galleryImages array in the script at the bottom of this file. -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <template x-for="(img, idx) in galleryImages" :key="img">
+                    <button type="button" @click="lightboxIndex = idx" class="aspect-square rounded-2xl overflow-hidden border border-gold-200/60 shadow-sm group">
+                        <img :src="img" :alt="'Nail set by Jen, photo ' + (idx + 1)" loading="lazy"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    </button>
+                </template>
+            </div>
+
+            <!-- Lightbox -->
+            <div x-show="lightboxIndex !== null" x-cloak
+                 class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+                 @click.self="lightboxIndex = null" @keydown.window.escape="lightboxIndex = null">
+                <button type="button" @click="lightboxIndex = null" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
+                <button type="button" @click.stop="lightboxIndex = (lightboxIndex + galleryImages.length - 1) % galleryImages.length"
+                        class="absolute left-3 sm:left-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8249;</button>
+                <img :src="galleryImages[lightboxIndex]" alt="Enlarged nail set photo" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
+                <button type="button" @click.stop="lightboxIndex = (lightboxIndex + 1) % galleryImages.length"
+                        class="absolute right-3 sm:right-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8250;</button>
+            </div>
+        </section>
 
         <!-- ============ BOOKING FORM ============ -->
         <div x-show="!submitted" class="grid md:grid-cols-3 gap-8">
@@ -302,9 +348,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                         </svg>
                         <span class="text-sm text-plum-500" x-text="fileName || 'Tap to upload a screenshot or photo of the style you like'"></span>
-                        <input type="file" accept="image/*" class="hidden" @change="handleReferenceFile($event)">
+                        <input type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0]?.name || ''">
                     </label>
-                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. This photo will be included on your downloadable booking receipt.</p>
+                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. Since this form sends via Messenger, please attach the photo there too.</p>
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
@@ -390,19 +436,15 @@
             <p class="text-xs text-gray-400 mt-4" x-show="form.serviceLocation === 'home_service'">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
 
             <div class="mt-6 space-y-3">
-                <button type="button" @click="downloadReceipt" class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    <span x-text="downloading ? 'Preparing image…' : '1. Download booking receipt'"></span>
-                </button>
-                <a :href="messengerLink" target="_blank" @click="downloadReceipt"
-                   class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
-                    2. Open Messenger to send it
+                <a :href="messengerLink" target="_blank"
+                   class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    Send via Messenger
                 </a>
-                <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
-                    <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
+                <button type="button" @click="copySummary" class="block w-full border-2 border-rose-300 text-rose-600 font-medium tracking-wide text-sm rounded-xl py-3 hover:border-rose-400 transition-all">
+                    <span x-text="copied ? 'Copied!' : 'Copy booking details'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking (with your reference photo, if you added one) to your device.</p>
+                <p class="text-xs text-plum-400">Remember to also attach your reference photo directly in Messenger if you uploaded one.</p>
             </div>
-            <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
@@ -474,9 +516,16 @@
                 pricing,
                 submitted: false,
                 copied: false,
-                downloading: false,
                 fileName: '',
-                referenceImageDataUrl: null,
+                lightboxIndex: null,
+                galleryImages: [
+                    'images/nail-set-1.jpg', 'images/nail-set-2.jpg', 'images/nail-set-3.jpg',
+                    'images/nail-set-4.jpg', 'images/nail-set-5.jpg', 'images/nail-set-6.jpg',
+                    'images/nail-set-7.jpg', 'images/nail-set-8.jpg', 'images/nail-set-9.jpg',
+                    'images/nail-set-10.jpg', 'images/nail-set-11.jpg', 'images/nail-set-12.jpg',
+                    'images/nail-set-13.jpg', 'images/nail-set-14.jpg', 'images/nail-set-15.jpg',
+                    'images/nail-set-16.jpg', 'images/nail-set-17.jpg',
+                ],
                 form: {
                     customerName: '',
                     contactNumber: '',
@@ -499,21 +548,6 @@
                 shapeIcon(shape) {
                     const path = shapePaths[shape] || shapePaths.Round;
                     return `<svg viewBox="0 0 44 60" class="w-8 h-11"><path d="${path}" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>`;
-                },
-
-                handleReferenceFile(event) {
-                    const file = event.target.files[0];
-                    if (!file) {
-                        this.fileName = '';
-                        this.referenceImageDataUrl = null;
-                        return;
-                    }
-                    this.fileName = file.name;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.referenceImageDataUrl = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
                 },
 
                 get total() {
@@ -576,263 +610,6 @@
                         this.copied = true;
                         setTimeout(() => (this.copied = false), 2000);
                     });
-                },
-
-                buildReceiptRows() {
-                    const f = this.form;
-                    const rows = [];
-                    rows.push(['Name', f.customerName]);
-                    rows.push(['Contact', f.contactNumber]);
-                    if (f.fbName) rows.push(['Facebook name', f.fbName]);
-                    if (f.preferredDate) rows.push(['Preferred date', f.preferredDate]);
-                    if (f.preferredTime) rows.push(['Preferred time', f.preferredTime]);
-                    rows.push(['Location', f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base']);
-                    if (f.serviceAddress) rows.push(['Address', f.serviceAddress]);
-                    rows.push(['Base service', pricing.base_services[f.baseService]?.label || '']);
-                    if (f.nailLength) rows.push(['Nail length', f.nailLength]);
-                    if (f.nailShape) rows.push(['Nail shape', f.nailShape]);
-                    if (f.nailColor) rows.push(['Nail color', f.nailColor]);
-                    if (f.hasFullSetDesign && f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
-                    Object.entries(f.addons).filter(([, qty]) => qty > 0).forEach(([key, qty]) => {
-                        rows.push([pricing.addons[key]?.label, `× ${qty}`]);
-                    });
-                    if (f.removalOption) rows.push(['Removal', pricing.removal[f.removalOption]?.label]);
-                    if (f.notes) rows.push(['Notes', f.notes]);
-                    return rows;
-                },
-
-                wrapText(ctx, text, maxWidth) {
-                    const words = String(text).split(' ');
-                    const lines = [];
-                    let line = '';
-                    for (const word of words) {
-                        const test = line ? line + ' ' + word : word;
-                        if (ctx.measureText(test).width > maxWidth && line) {
-                            lines.push(line);
-                            line = word;
-                        } else {
-                            line = test;
-                        }
-                    }
-                    if (line) lines.push(line);
-                    return lines;
-                },
-
-                loadImage(src) {
-                    return new Promise((resolve, reject) => {
-                        const img = new Image();
-                        img.onload = () => resolve(img);
-                        img.onerror = reject;
-                        img.src = src;
-                    });
-                },
-
-                async drawReceipt() {
-                    const canvas = this.$refs.receiptCanvas;
-                    const ctx = canvas.getContext('2d');
-
-                    if (document.fonts && document.fonts.ready) {
-                        try {
-                            await document.fonts.load('600 40px "Playfair Display"');
-                            await document.fonts.load('40px "Alex Brush"');
-                            await document.fonts.load('600 16px "Jost"');
-                            await document.fonts.load('16px "Jost"');
-                            await document.fonts.ready;
-                        } catch (e) { /* fonts best-effort */ }
-                    }
-
-                    // Load reference photo, if any, before measuring layout
-                    let refImg = null;
-                    if (this.referenceImageDataUrl) {
-                        try {
-                            refImg = await this.loadImage(this.referenceImageDataUrl);
-                        } catch (e) { refImg = null; }
-                    }
-
-                    const rows = this.buildReceiptRows();
-                    const padding = 56;
-                    const width = 800;
-                    const rowLineHeight = 24;
-                    const rowGap = 14;
-                    const imageAreaWidth = width - 48 - (padding - 24) * 2; // available width inside card
-
-                    let imageDisplayHeight = 0;
-                    if (refImg) {
-                        const maxImgHeight = 420;
-                        const scale = Math.min(imageAreaWidth / refImg.width, maxImgHeight / refImg.height);
-                        imageDisplayHeight = Math.round(refImg.height * scale);
-                    }
-
-                    // Measure total height first
-                    ctx.font = '16px Jost, sans-serif';
-                    let measuredHeight = 260; // header + total block
-                    rows.forEach(([label, value]) => {
-                        const lines = this.wrapText(ctx, value, width - padding * 2 - 220);
-                        measuredHeight += Math.max(lines.length, 1) * rowLineHeight + rowGap;
-                    });
-                    measuredHeight += 140; // total + footer
-                    if (refImg) measuredHeight += imageDisplayHeight + 76; // label + image + spacing
-
-                    canvas.width = width;
-                    canvas.height = measuredHeight;
-
-                    // Background
-                    ctx.fillStyle = '#fdf2f4';
-                    ctx.fillRect(0, 0, width, measuredHeight);
-                    const grad = ctx.createRadialGradient(width * 0.1, 0, 0, width * 0.1, 0, 500);
-                    grad.addColorStop(0, 'rgba(212,171,77,0.14)');
-                    grad.addColorStop(1, 'rgba(212,171,77,0)');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, width, measuredHeight);
-
-                    // Card
-                    const cardX = 24, cardY = 24, cardW = width - 48, cardH = measuredHeight - 48;
-                    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 24);
-                    ctx.fill();
-                    ctx.strokeStyle = '#ecd8a2';
-                    ctx.lineWidth = 2;
-                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 24);
-                    ctx.stroke();
-
-                    let y = cardY + 70;
-                    const x = cardX + padding - 24;
-
-                    // Header script name
-                    ctx.textBaseline = 'alphabetic';
-                    ctx.fillStyle = '#c22e51';
-                    ctx.font = '44px "Alex Brush", cursive';
-                    ctx.fillText('Jen Nail Artistry', x, y);
-
-                    y += 32;
-                    ctx.fillStyle = '#c2953a';
-                    ctx.font = '600 12px Jost, sans-serif';
-                    ctx.save();
-                    ctx.letterSpacing = '2px';
-                    ctx.fillText('BOOKING REQUEST', x, y);
-                    ctx.restore();
-
-                    y += 40;
-                    ctx.strokeStyle = '#ecd8a2';
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(cardX + cardW - padding + 24, y);
-                    ctx.stroke();
-
-                    y += 40;
-                    const labelX = x;
-                    const valueX = x + 210;
-                    const valueMaxWidth = cardW - padding * 2 - (valueX - x) + 24;
-
-                    rows.forEach(([label, value]) => {
-                        ctx.fillStyle = '#8a4d68';
-                        ctx.font = '15px Jost, sans-serif';
-                        ctx.fillText(label, labelX, y);
-
-                        ctx.fillStyle = '#391826';
-                        ctx.font = '600 15px Jost, sans-serif';
-                        const lines = this.wrapText(ctx, value, valueMaxWidth);
-                        lines.forEach((line, i) => {
-                            ctx.fillText(line, valueX, y + i * rowLineHeight);
-                        });
-                        y += Math.max(lines.length, 1) * rowLineHeight + rowGap;
-                    });
-
-                    if (refImg) {
-                        y += 12;
-                        ctx.fillStyle = '#c2953a';
-                        ctx.font = '600 12px Jost, sans-serif';
-                        ctx.save();
-                        ctx.letterSpacing = '2px';
-                        ctx.fillText('REFERENCE PHOTO', labelX, y);
-                        ctx.restore();
-
-                        y += 16;
-                        const imgX = labelX;
-                        const imgY = y;
-                        const imgW = imageAreaWidth;
-                        const imgH = imageDisplayHeight;
-
-                        ctx.save();
-                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
-                        ctx.clip();
-                        // Cover-fit the image within the rounded box
-                        const boxRatio = imgW / imgH;
-                        const imgRatio = refImg.width / refImg.height;
-                        let drawW, drawH, drawX, drawY;
-                        if (imgRatio > boxRatio) {
-                            drawH = imgH;
-                            drawW = imgH * imgRatio;
-                            drawX = imgX - (drawW - imgW) / 2;
-                            drawY = imgY;
-                        } else {
-                            drawW = imgW;
-                            drawH = imgW / imgRatio;
-                            drawX = imgX;
-                            drawY = imgY - (drawH - imgH) / 2;
-                        }
-                        ctx.drawImage(refImg, drawX, drawY, drawW, drawH);
-                        ctx.restore();
-
-                        ctx.strokeStyle = '#ecd8a2';
-                        ctx.lineWidth = 2;
-                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
-                        ctx.stroke();
-
-                        y += imgH + 24;
-                    }
-
-                    y += 10;
-                    ctx.strokeStyle = '#ecd8a2';
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(cardX + cardW - padding + 24, y);
-                    ctx.stroke();
-
-                    y += 46;
-                    ctx.fillStyle = '#c22e51';
-                    ctx.font = '600 26px "Playfair Display", serif';
-                    ctx.fillText('Estimated total', labelX, y);
-                    ctx.textAlign = 'right';
-                    ctx.fillText('₱' + this.total, cardX + cardW - padding + 24, y);
-                    ctx.textAlign = 'left';
-
-                    if (this.form.serviceLocation === 'home_service') {
-                        y += 26;
-                        ctx.fillStyle = '#8a4d68';
-                        ctx.font = 'italic 13px Jost, sans-serif';
-                        ctx.fillText('+ home service fee, to be confirmed by Jen', labelX, y);
-                    }
-
-                    y += 40;
-                    ctx.fillStyle = '#8a4d68';
-                    ctx.font = '12px Jost, sans-serif';
-                    ctx.fillText('Paliparan 2, Dasmariñas, Cavite  ·  @nailsbyjen.ph', labelX, y);
-
-                    return canvas;
-                },
-
-                roundRect(ctx, x, y, w, h, r) {
-                    ctx.beginPath();
-                    ctx.moveTo(x + r, y);
-                    ctx.arcTo(x + w, y, x + w, y + h, r);
-                    ctx.arcTo(x + w, y + h, x, y + h, r);
-                    ctx.arcTo(x, y + h, x, y, r);
-                    ctx.arcTo(x, y, x + w, y, r);
-                    ctx.closePath();
-                },
-
-                async downloadReceipt() {
-                    this.downloading = true;
-                    try {
-                        const canvas = await this.drawReceipt();
-                        const link = document.createElement('a');
-                        link.download = `booking-${(this.form.customerName || 'request').replace(/\s+/g, '-').toLowerCase()}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    } finally {
-                        this.downloading = false;
-                    }
                 },
             };
         }

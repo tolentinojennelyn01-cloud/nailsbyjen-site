@@ -302,9 +302,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                         </svg>
                         <span class="text-sm text-plum-500" x-text="fileName || 'Tap to upload a screenshot or photo of the style you like'"></span>
-                        <input type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0]?.name || ''">
+                        <input type="file" accept="image/*" class="hidden" @change="handleReferenceFile($event)">
                     </label>
-                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. Since this form sends via Messenger, please attach the photo there too.</p>
+                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. This photo will be included on your downloadable booking receipt.</p>
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
@@ -400,7 +400,7 @@
                 <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
                     <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking to your device. Step 2 opens Messenger — attach that picture there (and your reference photo, if you uploaded one).</p>
+                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking (with your reference photo, if you added one) to your device.</p>
             </div>
             <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
@@ -476,6 +476,7 @@
                 copied: false,
                 downloading: false,
                 fileName: '',
+                referenceImageDataUrl: null,
                 form: {
                     customerName: '',
                     contactNumber: '',
@@ -498,6 +499,21 @@
                 shapeIcon(shape) {
                     const path = shapePaths[shape] || shapePaths.Round;
                     return `<svg viewBox="0 0 44 60" class="w-8 h-11"><path d="${path}" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>`;
+                },
+
+                handleReferenceFile(event) {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        this.fileName = '';
+                        this.referenceImageDataUrl = null;
+                        return;
+                    }
+                    this.fileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.referenceImageDataUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
                 },
 
                 get total() {
@@ -602,6 +618,15 @@
                     return lines;
                 },
 
+                loadImage(src) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                        img.src = src;
+                    });
+                },
+
                 async drawReceipt() {
                     const canvas = this.$refs.receiptCanvas;
                     const ctx = canvas.getContext('2d');
@@ -616,11 +641,27 @@
                         } catch (e) { /* fonts best-effort */ }
                     }
 
+                    // Load reference photo, if any, before measuring layout
+                    let refImg = null;
+                    if (this.referenceImageDataUrl) {
+                        try {
+                            refImg = await this.loadImage(this.referenceImageDataUrl);
+                        } catch (e) { refImg = null; }
+                    }
+
                     const rows = this.buildReceiptRows();
                     const padding = 56;
                     const width = 800;
                     const rowLineHeight = 24;
                     const rowGap = 14;
+                    const imageAreaWidth = width - 48 - (padding - 24) * 2; // available width inside card
+
+                    let imageDisplayHeight = 0;
+                    if (refImg) {
+                        const maxImgHeight = 420;
+                        const scale = Math.min(imageAreaWidth / refImg.width, maxImgHeight / refImg.height);
+                        imageDisplayHeight = Math.round(refImg.height * scale);
+                    }
 
                     // Measure total height first
                     ctx.font = '16px Jost, sans-serif';
@@ -630,6 +671,7 @@
                         measuredHeight += Math.max(lines.length, 1) * rowLineHeight + rowGap;
                     });
                     measuredHeight += 140; // total + footer
+                    if (refImg) measuredHeight += imageDisplayHeight + 76; // label + image + spacing
 
                     canvas.width = width;
                     canvas.height = measuredHeight;
@@ -695,6 +737,50 @@
                         });
                         y += Math.max(lines.length, 1) * rowLineHeight + rowGap;
                     });
+
+                    if (refImg) {
+                        y += 12;
+                        ctx.fillStyle = '#c2953a';
+                        ctx.font = '600 12px Jost, sans-serif';
+                        ctx.save();
+                        ctx.letterSpacing = '2px';
+                        ctx.fillText('REFERENCE PHOTO', labelX, y);
+                        ctx.restore();
+
+                        y += 16;
+                        const imgX = labelX;
+                        const imgY = y;
+                        const imgW = imageAreaWidth;
+                        const imgH = imageDisplayHeight;
+
+                        ctx.save();
+                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
+                        ctx.clip();
+                        // Cover-fit the image within the rounded box
+                        const boxRatio = imgW / imgH;
+                        const imgRatio = refImg.width / refImg.height;
+                        let drawW, drawH, drawX, drawY;
+                        if (imgRatio > boxRatio) {
+                            drawH = imgH;
+                            drawW = imgH * imgRatio;
+                            drawX = imgX - (drawW - imgW) / 2;
+                            drawY = imgY;
+                        } else {
+                            drawW = imgW;
+                            drawH = imgW / imgRatio;
+                            drawX = imgX;
+                            drawY = imgY - (drawH - imgH) / 2;
+                        }
+                        ctx.drawImage(refImg, drawX, drawY, drawW, drawH);
+                        ctx.restore();
+
+                        ctx.strokeStyle = '#ecd8a2';
+                        ctx.lineWidth = 2;
+                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
+                        ctx.stroke();
+
+                        y += imgH + 24;
+                    }
 
                     y += 10;
                     ctx.strokeStyle = '#ecd8a2';

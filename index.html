@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book your nails - Nails by Jen</title>
+    <meta name="description" content="Book your nail appointment with Nails by Jen — Paliparan 2, Dasmariñas, Cavite.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Jost:wght@300;400;500;600&family=Alex+Brush&display=swap" rel="stylesheet">
+
+    <!-- Tailwind via CDN -- no build step needed, works great on GitHub Pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rose: {
+                            50: '#fdf2f4', 100: '#fce7ea', 200: '#f9c9d1',
+                            300: '#f4a3b1', 400: '#ec7690', 500: '#df4d6e',
+                            600: '#c22e51', 700: '#a12142', 800: '#861d3a',
+                        },
+                        gold: {
+                            50: '#fbf7ec', 100: '#f5ebce', 200: '#ecd8a2',
+                            300: '#e0bf70', 400: '#d4ab4d', 500: '#c2953a',
+                            600: '#a3792d', 700: '#835f26', 800: '#5c4119',
+                        },
+                        plum: {
+                            50: '#f7f0f3', 400: '#8a4d68', 600: '#5c2740', 700: '#481e32', 800: '#391826',
+                        },
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['Jost', 'system-ui', 'sans-serif'],
+                        script: ['"Alex Brush"', 'cursive'],
+                    },
+                    boxShadow: {
+                        glam: '0 10px 30px -10px rgba(194, 46, 81, 0.25)',
+                    },
+                },
+            },
+        };
+    </script>
+
+    <!-- Alpine.js for the reactive price calculator, no build step needed -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body {
+            font-family: 'Jost', system-ui, sans-serif;
+            background-color: #fdf2f4;
+            background-image:
+                radial-gradient(ellipse 700px 420px at 8% -8%, rgba(212, 171, 77, 0.16), transparent 60%),
+                radial-gradient(ellipse 700px 420px at 100% 0%, rgba(223, 77, 110, 0.14), transparent 60%);
+            background-attachment: fixed;
+        }
+        .glam-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .glam-divider::before,
+        .glam-divider::after {
+            content: '';
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(90deg, transparent, #d4ab4d, transparent);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-plum-800">
+
+    <header class="bg-white/70 backdrop-blur border-b border-gold-200/60">
+        <div class="max-w-4xl mx-auto px-4 py-5 flex items-center justify-between">
+            <a href="#" onclick="location.reload(); return false;" class="flex items-baseline gap-2">
+                <span class="font-script text-4xl leading-none bg-gradient-to-r from-rose-600 via-rose-500 to-gold-500 bg-clip-text text-transparent">Jen Nail Artistry</span>
+                <span class="text-[11px] uppercase tracking-[0.2em] text-gold-700/80 font-medium">Nailtech Beginner</span>
+            </a>
+            <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="text-sm text-rose-500 hover:text-rose-600 transition-colors">@nailsbyjen.ph</a>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10" x-data="bookingPage()">
+
+        <!-- ============ BOOKING FORM ============ -->
+        <div x-show="!submitted" class="grid md:grid-cols-3 gap-8">
+
+            <form @submit.prevent="submitBooking" class="md:col-span-2 bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
+
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Reserve your appointment</p>
+                    <h1 class="text-3xl font-serif font-semibold text-rose-600">Book your nails</h1>
+                    <p class="text-sm text-plum-400 mt-2">Fill this out, then send it to Jen on Facebook/Messenger to confirm your slot.</p>
+                </div>
+
+                <!-- Customer info -->
+                <fieldset class="space-y-4">
+                    <legend class="font-serif text-lg text-plum-700 mb-2">Your details</legend>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm mb-1">Full name</label>
+                            <input type="text" x-model="form.customerName" required
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Contact number</label>
+                            <input type="text" x-model="form.contactNumber" required
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Facebook name (optional)</label>
+                            <input type="text" x-model="form.fbName"
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Preferred date</label>
+                            <input type="date" x-model="form.preferredDate"
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Preferred time</label>
+                            <input type="time" x-model="form.preferredTime"
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                    </div>
+
+                    <!-- Service location -->
+                    <div>
+                        <label class="block text-sm mb-2">Where would you like your appointment?</label>
+                        <div class="grid sm:grid-cols-2 gap-3">
+                            <label class="flex items-start gap-3 border-2 rounded-xl px-4 py-3 cursor-pointer transition-colors"
+                                :class="form.serviceLocation === 'home_service' ? 'border-gold-400 bg-rose-50/70' : 'border-rose-200'">
+                                <input type="radio" name="service_location" value="home_service" required
+                                    x-model="form.serviceLocation" class="mt-1 text-rose-500 focus:ring-rose-400">
+                                <span>
+                                    <span class="block font-medium text-sm">Home Service</span>
+                                    <span class="block text-xs text-plum-400">Jen travels to your address</span>
+                                </span>
+                            </label>
+                            <label class="flex items-start gap-3 border-2 rounded-xl px-4 py-3 cursor-pointer transition-colors"
+                                :class="form.serviceLocation === 'home_base' ? 'border-gold-400 bg-rose-50/70' : 'border-rose-200'">
+                                <input type="radio" name="service_location" value="home_base"
+                                    x-model="form.serviceLocation" class="mt-1 text-rose-500 focus:ring-rose-400">
+                                <span>
+                                    <span class="block font-medium text-sm">Home Base</span>
+                                    <span class="block text-xs text-plum-400">You come to Jen's place in Paliparan 2, Dasmariñas</span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <div x-show="form.serviceLocation === 'home_service'" x-cloak class="mt-3">
+                            <label class="block text-sm mb-1">Your address (city / barangay)</label>
+                            <input type="text" x-model="form.serviceAddress"
+                                placeholder="e.g. Barangay Paliparan 3, Dasmariñas City"
+                                class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                            <p class="text-xs text-plum-400 mt-1">A home service fee applies based on distance — Jen will confirm the exact amount once she reviews your address.</p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Base service -->
+                <fieldset>
+                    <legend class="font-serif text-lg text-plum-700 mb-2">Base service</legend>
+                    <div class="space-y-2">
+                        <template x-for="[key, item] in Object.entries(pricing.base_services)" :key="key">
+                            <label class="flex items-center justify-between border rounded-xl px-4 py-3 cursor-pointer transition-colors"
+                                   :class="form.baseService === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                <span class="flex items-center gap-3">
+                                    <input type="radio" name="base_service" :value="key" x-model="form.baseService" required class="text-rose-500 focus:ring-rose-400">
+                                    <span x-text="item.label"></span>
+                                </span>
+                                <span class="text-sm text-plum-400">₱<span x-text="item.price"></span></span>
+                            </label>
+                        </template>
+                    </div>
+                </fieldset>
+
+                <!-- Nail length / shape / color -->
+                <fieldset class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm mb-1">Nail length preference</label>
+                        <select x-model="form.nailLength" class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                            <option value="">Select length</option>
+                            <option value="short">Short</option>
+                            <option value="medium">Medium</option>
+                            <option value="long">Long</option>
+                        </select>
+                        <p class="text-xs text-plum-400 mt-1">Extension pricing above already reflects short-med vs long.</p>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm mb-2">Nail shape</label>
+                        <div class="flex flex-wrap gap-3">
+                            <template x-for="shape in pricing.nail_shapes" :key="shape">
+                                <label class="flex flex-col items-center gap-1 cursor-pointer group w-16">
+                                    <span class="relative flex items-center justify-center w-16 h-16 rounded-xl border-2 transition-colors"
+                                        :class="form.nailShape === shape ? 'border-gold-400 bg-rose-50/70 text-rose-600 shadow-glam' : 'border-rose-200 text-rose-300 group-hover:border-rose-300'">
+                                        <input type="radio" name="nail_shape" :value="shape" x-model="form.nailShape" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                        <span x-html="shapeIcon(shape)"></span>
+                                    </span>
+                                    <span class="text-[11px] text-plum-400 text-center" x-text="shape"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm mb-2">Nail color</label>
+                        <div class="flex flex-wrap gap-3">
+                            <template x-for="[hex, label] in Object.entries(pricing.nail_colors)" :key="hex">
+                                <label class="flex flex-col items-center gap-1 cursor-pointer group">
+                                    <span class="relative w-9 h-9">
+                                        <input type="radio" name="nail_color" :value="label" x-model="form.nailColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                        <span
+                                            :style="hex !== 'custom' ? ('background-color:' + hex) : ''"
+                                            class="pointer-events-none absolute inset-0 rounded-full border-2 flex items-center justify-center text-[10px] transition-all"
+                                            :class="[form.nailColor === label ? 'border-gold-500 ring-2 ring-gold-300 shadow-glam' : 'border-gray-200 group-hover:border-gold-300', hex === 'custom' ? 'bg-gray-100' : '']"
+                                            x-text="hex === 'custom' ? '?' : ''"></span>
+                                    </span>
+                                    <span class="text-[11px] text-plum-400 text-center w-14" x-text="label"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Full set design -->
+                <fieldset>
+                    <label class="flex items-center gap-2 mb-2 font-serif text-lg text-plum-700">
+                        <input type="checkbox" x-model="form.hasFullSetDesign" class="text-rose-500 focus:ring-rose-400">
+                        Add a Full Set Design
+                    </label>
+                    <div x-show="form.hasFullSetDesign" x-cloak class="space-y-2 pl-6">
+                        <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
+                            <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                                   :class="form.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                <span class="flex items-center gap-3">
+                                    <input type="radio" name="full_set_design_type" :value="key" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                                    <span x-text="item.label"></span>
+                                </span>
+                                <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
+                            </label>
+                        </template>
+                    </div>
+                </fieldset>
+
+                <!-- Per-nail add-ons -->
+                <fieldset>
+                    <legend class="font-serif text-lg text-plum-700 mb-2">Per-nail add-ons</legend>
+                    <div class="space-y-2">
+                        <template x-for="[key, item] in Object.entries(pricing.addons)" :key="key">
+                            <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2">
+                                <div>
+                                    <p x-text="item.label" class="text-sm"></p>
+                                    <p class="text-xs text-plum-400">₱<span x-text="item.price"></span> per nail</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" @click="form.addons[key] = Math.max(0, (form.addons[key]||0) - 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">−</button>
+                                    <input type="number" x-model.number="form.addons[key]" min="0" max="10"
+                                        class="w-12 text-center rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                                    <button type="button" @click="form.addons[key] = Math.min(10, (form.addons[key]||0) + 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">+</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </fieldset>
+
+                <!-- Removal -->
+                <fieldset>
+                    <legend class="font-serif text-lg text-plum-700 mb-2">Removal (if applicable)</legend>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="removal_option" value="" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                            No removal needed
+                        </label>
+                        <template x-for="[key, item] in Object.entries(pricing.removal)" :key="key">
+                            <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                                   :class="form.removalOption === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                <span class="flex items-center gap-3">
+                                    <input type="radio" name="removal_option" :value="key" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                                    <span x-text="item.label"></span>
+                                </span>
+                                <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
+                            </label>
+                        </template>
+                    </div>
+                </fieldset>
+
+                <div>
+                    <label class="block text-sm mb-1">Notes (design inspo, custom color, allergies, etc.)</label>
+                    <textarea x-model="form.notes" rows="3" class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400"></textarea>
+                </div>
+
+                <!-- Reference photo -->
+                <div>
+                    <label class="block text-sm mb-1">Got a design in mind? Attach a reference photo (optional)</label>
+                    <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
+                        <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                        <span class="text-sm text-plum-500" x-text="fileName || 'Tap to upload a screenshot or photo of the style you like'"></span>
+                        <input type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0]?.name || ''">
+                    </label>
+                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. Since this form sends via Messenger, please attach the photo there too.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    Send booking request
+                </button>
+            </form>
+
+            <!-- ============ LIVE PRICE SUMMARY ============ -->
+            <aside class="md:col-span-1">
+                <div class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sticky top-6 space-y-3">
+                    <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Your glam</p>
+                    <h2 class="font-serif text-xl font-semibold text-rose-600 mb-2">Estimated total</h2>
+
+                    <div class="flex justify-between text-sm" x-show="form.baseService">
+                        <span x-text="form.baseService ? pricing.base_services[form.baseService].label : ''"></span>
+                        <span x-text="'₱' + (form.baseService ? pricing.base_services[form.baseService].price : 0)"></span>
+                    </div>
+
+                    <div class="flex justify-between text-sm" x-show="form.hasFullSetDesign && form.fullSetDesignType">
+                        <span x-text="form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].label : ''"></span>
+                        <span x-text="'₱' + (form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].price : 0)"></span>
+                    </div>
+
+                    <template x-for="[key, qty] in Object.entries(form.addons)" :key="key">
+                        <div class="flex justify-between text-sm" x-show="qty > 0">
+                            <span x-text="pricing.addons[key]?.label + ' × ' + qty"></span>
+                            <span x-text="'₱' + (pricing.addons[key]?.price * qty)"></span>
+                        </div>
+                    </template>
+
+                    <div class="flex justify-between text-sm" x-show="form.removalOption">
+                        <span x-text="form.removalOption ? pricing.removal[form.removalOption].label : ''"></span>
+                        <span x-text="'₱' + (form.removalOption ? pricing.removal[form.removalOption].price : 0)"></span>
+                    </div>
+
+                    <div class="flex justify-between text-sm text-plum-400 italic" x-show="form.serviceLocation === 'home_service'">
+                        <span>Home service fee</span>
+                        <span>TBD</span>
+                    </div>
+
+                    <hr class="border-gold-200">
+                    <div class="flex justify-between font-serif font-semibold text-xl text-rose-600">
+                        <span>Total</span>
+                        <span x-text="'₱' + total"></span>
+                    </div>
+                    <p class="text-xs text-plum-400" x-show="form.serviceLocation === 'home_service'">Home service fee not yet included — Jen will confirm it based on your address.</p>
+                    <p class="text-xs text-plum-400" x-show="form.serviceLocation !== 'home_service'">Final price confirmed by Jen once the design is finalized in person.</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- ============ CONFIRMATION ============ -->
+        <div x-show="submitted" x-cloak class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
+            <div class="text-4xl mb-2">💖</div>
+            <h1 class="text-xl font-bold text-rose-600 mb-1">Booking request ready!</h1>
+            <p class="text-sm text-gray-500 mb-6">Tap below to send it to Jen on Facebook Messenger — she'll confirm your schedule there.</p>
+
+            <div class="text-left space-y-2 text-sm bg-rose-50 rounded-xl p-4">
+                <div class="flex justify-between"><span class="text-gray-500">Name</span><span x-text="form.customerName"></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Base service</span><span x-text="pricing.base_services[form.baseService]?.label"></span></div>
+                <template x-if="form.hasFullSetDesign && form.fullSetDesignType">
+                    <div class="flex justify-between"><span class="text-gray-500">Design</span><span x-text="pricing.full_set_designs[form.fullSetDesignType]?.label"></span></div>
+                </template>
+                <template x-if="form.nailColor">
+                    <div class="flex justify-between"><span class="text-gray-500">Color</span><span x-text="form.nailColor"></span></div>
+                </template>
+                <template x-if="form.serviceLocation">
+                    <div class="flex justify-between"><span class="text-gray-500">Location</span><span x-text="form.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base'"></span></div>
+                </template>
+                <template x-if="form.serviceAddress">
+                    <div class="flex justify-between"><span class="text-gray-500">Address</span><span x-text="form.serviceAddress"></span></div>
+                </template>
+                <template x-if="form.preferredDate">
+                    <div class="flex justify-between"><span class="text-gray-500">Preferred date</span><span x-text="form.preferredDate"></span></div>
+                </template>
+                <template x-if="form.preferredTime">
+                    <div class="flex justify-between"><span class="text-gray-500">Preferred time</span><span x-text="form.preferredTime"></span></div>
+                </template>
+                <hr class="border-rose-200">
+                <div class="flex justify-between font-bold text-rose-600"><span>Estimated total</span><span x-text="'₱' + total"></span></div>
+            </div>
+
+            <p class="text-xs text-gray-400 mt-4" x-show="form.serviceLocation === 'home_service'">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
+
+            <div class="mt-6 space-y-3">
+                <a :href="messengerLink" target="_blank"
+                   class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    Send via Messenger
+                </a>
+                <button type="button" @click="copySummary" class="block w-full border-2 border-rose-300 text-rose-600 font-medium tracking-wide text-sm rounded-xl py-3 hover:border-rose-400 transition-all">
+                    <span x-text="copied ? 'Copied!' : 'Copy booking details'"></span>
+                </button>
+                <p class="text-xs text-plum-400">Remember to also attach your reference photo directly in Messenger if you uploaded one.</p>
+            </div>
+
+            <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
+        </div>
+    </main>
+
+    <footer class="text-center py-10">
+        <div class="max-w-xs mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+        <p class="text-xs tracking-wide text-plum-400">
+            Paliparan 2, Dasmariñas, Cavite &middot; nailsbyjen.ph
+        </p>
+    </footer>
+
+    <script>
+        // ── Edit this to point at your own Facebook Page username ──
+        const FACEBOOK_USERNAME = 'nailsbyjen.ph';
+
+        const pricing = {
+            base_services: {
+                softgel_short_med: { label: 'Softgel Extension (short-med)', price: 300 },
+                softgel_long: { label: 'Softgel Extension (long)', price: 350 },
+                gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 270 },
+            },
+            full_set_designs: {
+                french: { label: 'French', price: 200 },
+                ombre: { label: 'Ombre', price: 200 },
+                cateye: { label: 'Cat eye', price: 200 },
+            },
+            addons: {
+                french: { label: 'French (per nail)', price: 20 },
+                ombre: { label: 'Ombre (per nail)', price: 20 },
+                nail_charms: { label: 'Nail Charms (per nail)', price: 15 },
+                rhinestones: { label: 'Rhinestones (per nail)', price: 20 },
+                '3d_flower': { label: '3D Flower (per nail)', price: 20 },
+                '3d_nail_art': { label: '3D Nail Art (per nail)', price: 20 },
+                nail_art: { label: 'Nail Art (per nail, avg)', price: 25 },
+                blooming_gel: { label: 'Blooming Gel (per nail)', price: 20 },
+                cat_eye_addon: { label: 'Cat Eye (per nail)', price: 20 },
+            },
+            removal: {
+                my_work: { label: 'Removal (my work)', price: 150 },
+                not_my_work: { label: 'Removal (not my work)', price: 200 },
+            },
+            nail_colors: {
+                '#F7CAC9': 'Blush Pink',
+                '#FFFFFF': 'Milky White',
+                '#F5DEB3': 'Nude Beige',
+                '#C0C0C0': 'Chrome Silver',
+                '#4A5A6A': 'Slate Gray',
+                '#800020': 'Wine Red',
+                '#000000': 'Black',
+                '#FFD1DC': 'Baby Pink',
+                '#E6E6FA': 'Lavender',
+                custom: 'Other / Custom (specify in notes)',
+            },
+            nail_shapes: ['Round', 'Oval', 'Almond', 'Coffin', 'Stiletto', 'Square'],
+        };
+
+        const shapePaths = {
+            Square: 'M12 52 Q12 56 16 56 L28 56 Q32 56 32 52 L32 14 Q32 8 28 8 L16 8 Q12 8 12 14 Z',
+            Round: 'M12 52 Q12 56 16 56 L28 56 Q32 56 32 52 L32 24 Q32 8 22 8 Q12 8 12 24 Z',
+            Oval: 'M14 52 Q14 56 18 56 L26 56 Q30 56 30 52 L30 20 Q30 6 22 4 Q14 6 14 20 Z',
+            Almond: 'M14 52 Q14 56 18 56 L26 56 Q30 56 30 52 L28 22 Q26 8 22 4 Q18 8 16 22 Z',
+            Coffin: 'M13 52 Q13 56 17 56 L27 56 Q31 56 31 52 L28 18 Q28 16 26 16 L18 16 Q16 16 16 18 Z',
+            Stiletto: 'M13 52 Q13 56 17 56 L27 56 Q31 56 31 52 L22 6 Z',
+        };
+
+        function bookingPage() {
+            return {
+                pricing,
+                submitted: false,
+                copied: false,
+                fileName: '',
+                form: {
+                    customerName: '',
+                    contactNumber: '',
+                    fbName: '',
+                    preferredDate: '',
+                    preferredTime: '',
+                    serviceLocation: '',
+                    serviceAddress: '',
+                    baseService: '',
+                    nailLength: '',
+                    nailShape: '',
+                    nailColor: '',
+                    hasFullSetDesign: false,
+                    fullSetDesignType: '',
+                    addons: {},
+                    removalOption: '',
+                    notes: '',
+                },
+
+                shapeIcon(shape) {
+                    const path = shapePaths[shape] || shapePaths.Round;
+                    return `<svg viewBox="0 0 44 60" class="w-8 h-11"><path d="${path}" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>`;
+                },
+
+                get total() {
+                    let sum = 0;
+                    if (this.form.baseService && pricing.base_services[this.form.baseService]) {
+                        sum += pricing.base_services[this.form.baseService].price;
+                    }
+                    if (this.form.hasFullSetDesign && this.form.fullSetDesignType && pricing.full_set_designs[this.form.fullSetDesignType]) {
+                        sum += pricing.full_set_designs[this.form.fullSetDesignType].price;
+                    }
+                    for (const [key, qty] of Object.entries(this.form.addons)) {
+                        if (qty > 0 && pricing.addons[key]) {
+                            sum += pricing.addons[key].price * qty;
+                        }
+                    }
+                    if (this.form.removalOption && pricing.removal[this.form.removalOption]) {
+                        sum += pricing.removal[this.form.removalOption].price;
+                    }
+                    return sum;
+                },
+
+                get summaryText() {
+                    const f = this.form;
+                    const lines = [
+                        `💅 New booking request`,
+                        `Name: ${f.customerName}`,
+                        `Contact: ${f.contactNumber}`,
+                    ];
+                    if (f.fbName) lines.push(`FB name: ${f.fbName}`);
+                    if (f.preferredDate) lines.push(`Preferred date: ${f.preferredDate}`);
+                    if (f.preferredTime) lines.push(`Preferred time: ${f.preferredTime}`);
+                    lines.push(`Location: ${f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base'}`);
+                    if (f.serviceAddress) lines.push(`Address: ${f.serviceAddress}`);
+                    lines.push(`Base service: ${pricing.base_services[f.baseService]?.label || ''}`);
+                    if (f.nailLength) lines.push(`Nail length: ${f.nailLength}`);
+                    if (f.nailShape) lines.push(`Nail shape: ${f.nailShape}`);
+                    if (f.nailColor) lines.push(`Nail color: ${f.nailColor}`);
+                    if (f.hasFullSetDesign && f.fullSetDesignType) lines.push(`Full set design: ${pricing.full_set_designs[f.fullSetDesignType]?.label}`);
+                    const addonLines = Object.entries(f.addons)
+                        .filter(([, qty]) => qty > 0)
+                        .map(([key, qty]) => `  - ${pricing.addons[key]?.label} × ${qty}`);
+                    if (addonLines.length) lines.push('Add-ons:', ...addonLines);
+                    if (f.removalOption) lines.push(`Removal: ${pricing.removal[f.removalOption]?.label}`);
+                    if (f.notes) lines.push(`Notes: ${f.notes}`);
+                    lines.push(`Estimated total: ₱${this.total}${f.serviceLocation === 'home_service' ? ' (+ home service fee, TBD)' : ''}`);
+                    return lines.join('\n');
+                },
+
+                get messengerLink() {
+                    return `https://m.me/${FACEBOOK_USERNAME}?text=${encodeURIComponent(this.summaryText)}`;
+                },
+
+                submitBooking() {
+                    this.submitted = true;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                copySummary() {
+                    navigator.clipboard.writeText(this.summaryText).then(() => {
+                        this.copied = true;
+                        setTimeout(() => (this.copied = false), 2000);
+                    });
+                },
+            };
+        }
+    </script>
+</body>
+</html>

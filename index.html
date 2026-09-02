@@ -49,7 +49,7 @@
                     },
                     fontFamily: {
                         serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                        sans: ['Jost', 'system-ui', 'sans-serif'],
+                        sans: ['"Bookman Old Style"', '"URW Bookman"', 'Georgia', 'serif'],
                         script: ['"Alex Brush"', 'cursive'],
                     },
                     boxShadow: {
@@ -66,7 +66,7 @@
     <style>
         [x-cloak] { display: none !important; }
         body {
-            font-family: 'Jost', system-ui, sans-serif;
+            font-family: 'Bookman Old Style', 'URW Bookman', Georgia, serif;
             background-color: #fdf2f4;
             background-image:
                 radial-gradient(ellipse 700px 420px at 8% -8%, rgba(212, 171, 77, 0.16), transparent 60%),
@@ -1002,5 +1002,9 @@
         4. View your stats any time by logging into goatcounter.com.
     -->
     <script data-goatcounter="https://nailsbyjen.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <!-- Cloudflare Web Analytics (free, privacy-friendly — no cookies, no personal data collected).
+         Replace YOUR-TOKEN-HERE below with the token from your Cloudflare Web Analytics dashboard.
+         See setup steps: https://developers.cloudflare.com/web-analytics/get-started/ -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fcf4f181386f499890fb64f4d74dff88"}'></script>
 </body>
 </html>

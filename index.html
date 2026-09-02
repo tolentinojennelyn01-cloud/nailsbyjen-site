@@ -95,10 +95,11 @@
             <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">A little about me</p>
             <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen 👋</h2>
             <p class="text-sm sm:text-base text-plum-400 leading-relaxed">
-                I'm a nail artist based in Paliparan 2, Dasmariñas, Cavite, just getting my nail business off the ground.
-                I put care into every set — from soft, everyday gel looks to fuller nail art — and I'm always excited to
-                bring your ideas to life. Book a slot above and let's create something you'll love showing off.
-            </p>
+                A little self-care, a little luxury, and nails made just for you.
+                I’m a beginner nail tech offering a cozy, home-based and home service nail experience where every set is done with care and attention to detail. If you’re looking for simple, elegant, and beautiful nails, I’d love to have you as one of my clients.
+                Your support means so much as I continue growing my skills and turning my passion into something beautiful.
+                Book your next nail appointment with me and let’s create a set you’ll love.
+             </p>
         </section>
 
         <!-- ============ GALLERY ============ -->
@@ -348,9 +349,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                         </svg>
                         <span class="text-sm text-plum-500" x-text="fileName || 'Tap to upload a screenshot or photo of the style you like'"></span>
-                        <input type="file" accept="image/*" class="hidden" @change="fileName = $event.target.files[0]?.name || ''">
+                        <input type="file" accept="image/*" class="hidden" @change="handleReferenceFile($event)">
                     </label>
-                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. Since this form sends via Messenger, please attach the photo there too.</p>
+                    <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. This photo will be included on your downloadable booking receipt.</p>
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
@@ -436,15 +437,19 @@
             <p class="text-xs text-gray-400 mt-4" x-show="form.serviceLocation === 'home_service'">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
 
             <div class="mt-6 space-y-3">
-                <a :href="messengerLink" target="_blank"
-                   class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    Send via Messenger
-                </a>
-                <button type="button" @click="copySummary" class="block w-full border-2 border-rose-300 text-rose-600 font-medium tracking-wide text-sm rounded-xl py-3 hover:border-rose-400 transition-all">
-                    <span x-text="copied ? 'Copied!' : 'Copy booking details'"></span>
+                <button type="button" @click="downloadReceipt" class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    <span x-text="downloading ? 'Preparing image…' : '1. Download booking receipt'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Remember to also attach your reference photo directly in Messenger if you uploaded one.</p>
+                <a :href="messengerLink" target="_blank" @click="downloadReceipt"
+                   class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
+                    2. Open Messenger to send it
+                </a>
+                <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
+                    <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
+                </button>
+                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking (with your reference photo, if you added one) to your device. Step 2 opens Messenger — attach that picture there.</p>
             </div>
+            <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
@@ -463,17 +468,17 @@
 
         const pricing = {
             base_services: {
-                softgel_short_med: { label: 'Softgel Extension (short-med)', price: 300 },
-                softgel_long: { label: 'Softgel Extension (long)', price: 350 },
-                gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 270 },
+                softgel_short_med: { label: 'Softgel Extension (short-med)', price: 299 },
+                softgel_long: { label: 'Softgel Extension (long)', price: 349 },
+                gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 269 },
             },
             full_set_designs: {
-                french: { label: 'French', price: 200 },
+                french: { label: 'French', price: 150 },
                 ombre: { label: 'Ombre', price: 200 },
                 cateye: { label: 'Cat eye', price: 200 },
             },
             addons: {
-                french: { label: 'French (per nail)', price: 20 },
+                french: { label: 'French (per nail)', price: 15 },
                 ombre: { label: 'Ombre (per nail)', price: 20 },
                 nail_charms: { label: 'Nail Charms (per nail)', price: 15 },
                 rhinestones: { label: 'Rhinestones (per nail)', price: 20 },
@@ -516,7 +521,9 @@
                 pricing,
                 submitted: false,
                 copied: false,
+                downloading: false,
                 fileName: '',
+                referenceImageDataUrl: null,
                 lightboxIndex: null,
                 galleryImages: [
                     'images/nail-set-1.jpg', 'images/nail-set-2.jpg', 'images/nail-set-3.jpg',
@@ -548,6 +555,21 @@
                 shapeIcon(shape) {
                     const path = shapePaths[shape] || shapePaths.Round;
                     return `<svg viewBox="0 0 44 60" class="w-8 h-11"><path d="${path}" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>`;
+                },
+
+                handleReferenceFile(event) {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        this.fileName = '';
+                        this.referenceImageDataUrl = null;
+                        return;
+                    }
+                    this.fileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.referenceImageDataUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
                 },
 
                 get total() {
@@ -610,6 +632,294 @@
                         this.copied = true;
                         setTimeout(() => (this.copied = false), 2000);
                     });
+                },
+
+                buildReceiptRows() {
+                    const f = this.form;
+                    const rows = [];
+                    rows.push(['Name', f.customerName]);
+                    rows.push(['Contact', f.contactNumber]);
+                    if (f.fbName) rows.push(['Facebook name', f.fbName]);
+                    if (f.preferredDate) rows.push(['Preferred date', f.preferredDate]);
+                    if (f.preferredTime) rows.push(['Preferred time', f.preferredTime]);
+                    rows.push(['Location', f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base']);
+                    if (f.serviceAddress) rows.push(['Address', f.serviceAddress]);
+                    rows.push(['Base service', pricing.base_services[f.baseService]?.label || '']);
+                    if (f.nailLength) rows.push(['Nail length', f.nailLength]);
+                    if (f.nailShape) rows.push(['Nail shape', f.nailShape]);
+                    if (f.nailColor) rows.push(['Nail color', f.nailColor]);
+                    if (f.hasFullSetDesign && f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
+                    Object.entries(f.addons).filter(([, qty]) => qty > 0).forEach(([key, qty]) => {
+                        rows.push([pricing.addons[key]?.label, `× ${qty}`]);
+                    });
+                    if (f.removalOption) rows.push(['Removal', pricing.removal[f.removalOption]?.label]);
+                    if (f.notes) rows.push(['Notes', f.notes]);
+                    return rows;
+                },
+
+                wrapText(ctx, text, maxWidth) {
+                    const words = String(text).split(' ');
+                    const lines = [];
+                    let line = '';
+                    for (const word of words) {
+                        const test = line ? line + ' ' + word : word;
+                        if (ctx.measureText(test).width > maxWidth && line) {
+                            lines.push(line);
+                            line = word;
+                        } else {
+                            line = test;
+                        }
+                    }
+                    if (line) lines.push(line);
+                    return lines;
+                },
+
+                roundRect(ctx, x, y, w, h, r) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.arcTo(x + w, y, x + w, y + h, r);
+                    ctx.arcTo(x + w, y + h, x, y + h, r);
+                    ctx.arcTo(x, y + h, x, y, r);
+                    ctx.arcTo(x, y, x + w, y, r);
+                    ctx.closePath();
+                },
+
+                loadImage(src) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                        img.src = src;
+                    });
+                },
+
+                async drawReceipt() {
+                    const canvas = this.$refs.receiptCanvas;
+                    const ctx = canvas.getContext('2d');
+
+                    if (document.fonts && document.fonts.ready) {
+                        try {
+                            await document.fonts.load('600 44px "Alex Brush"');
+                            await document.fonts.load('600 26px "Playfair Display"');
+                            await document.fonts.load('600 16px "Jost"');
+                            await document.fonts.load('16px "Jost"');
+                            await document.fonts.ready;
+                        } catch (e) { /* fonts best-effort */ }
+                    }
+
+                    let refImg = null;
+                    if (this.referenceImageDataUrl) {
+                        try { refImg = await this.loadImage(this.referenceImageDataUrl); } catch (e) { refImg = null; }
+                    }
+
+                    const rows = this.buildReceiptRows();
+                    const width = 760;
+                    const outerPad = 40;      // gap from canvas edge to card
+                    const cardPad = 48;       // gap from card edge to content
+                    const rowLineHeight = 25;
+                    const rowGap = 16;
+                    const labelColWidth = 190;
+                    const contentWidth = width - outerPad * 2 - cardPad * 2;
+                    const valueMaxWidth = contentWidth - labelColWidth;
+
+                    let imageDisplayHeight = 0;
+                    if (refImg) {
+                        const maxImgHeight = 380;
+                        const scale = Math.min(contentWidth / refImg.width, maxImgHeight / refImg.height, 1.4);
+                        imageDisplayHeight = Math.round(refImg.height * scale);
+                    }
+
+                    ctx.font = '15px Jost, sans-serif';
+                    let measuredHeight = 250; // header block
+                    rows.forEach(([label, value]) => {
+                        const lines = this.wrapText(ctx, value, valueMaxWidth);
+                        measuredHeight += Math.max(lines.length, 1) * rowLineHeight + rowGap;
+                    });
+                    if (refImg) measuredHeight += imageDisplayHeight + 70;
+                    measuredHeight += 150; // total block + footer
+
+                    canvas.width = width;
+                    canvas.height = measuredHeight;
+
+                    // Soft background
+                    ctx.fillStyle = '#fdf2f4';
+                    ctx.fillRect(0, 0, width, measuredHeight);
+                    const grad = ctx.createRadialGradient(width * 0.05, 0, 0, width * 0.05, 0, 460);
+                    grad.addColorStop(0, 'rgba(212,171,77,0.16)');
+                    grad.addColorStop(1, 'rgba(212,171,77,0)');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, width, measuredHeight);
+                    const grad2 = ctx.createRadialGradient(width * 0.95, 0, 0, width * 0.95, 0, 420);
+                    grad2.addColorStop(0, 'rgba(223,77,110,0.12)');
+                    grad2.addColorStop(1, 'rgba(223,77,110,0)');
+                    ctx.fillStyle = grad2;
+                    ctx.fillRect(0, 0, width, measuredHeight);
+
+                    // Card with soft shadow
+                    const cardX = outerPad, cardY = outerPad, cardW = width - outerPad * 2, cardH = measuredHeight - outerPad * 2;
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(194,46,81,0.18)';
+                    ctx.shadowBlur = 28;
+                    ctx.shadowOffsetY = 10;
+                    ctx.fillStyle = '#ffffff';
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.lineWidth = 1.5;
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+                    ctx.stroke();
+
+                    const x = cardX + cardPad;
+                    const rightEdge = cardX + cardW - cardPad;
+                    let y = cardY + 68;
+
+                    // Header
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '46px "Alex Brush", cursive';
+                    ctx.fillText('Jen Nail Artistry', width / 2, y);
+
+                    y += 30;
+                    ctx.fillStyle = '#c2953a';
+                    ctx.font = '600 12px Jost, sans-serif';
+                    ctx.save();
+                    ctx.letterSpacing = '3px';
+                    ctx.fillText('BOOKING REQUEST', width / 2, y);
+                    ctx.restore();
+                    ctx.textAlign = 'left';
+
+                    y += 22;
+                    this.drawDivider(ctx, x, rightEdge, y, true);
+
+                    y += 38;
+                    rows.forEach(([label, value]) => {
+                        ctx.fillStyle = '#a3792d';
+                        ctx.font = '13px Jost, sans-serif';
+                        ctx.fillText(String(label).toUpperCase(), x, y);
+
+                        ctx.fillStyle = '#391826';
+                        ctx.font = '600 16px Jost, sans-serif';
+                        const lines = this.wrapText(ctx, value, valueMaxWidth);
+                        lines.forEach((line, i) => {
+                            ctx.fillText(line, x + labelColWidth, y + i * rowLineHeight);
+                        });
+                        y += Math.max(lines.length, 1) * rowLineHeight + rowGap;
+                    });
+
+                    if (refImg) {
+                        y += 6;
+                        ctx.fillStyle = '#c2953a';
+                        ctx.font = '600 12px Jost, sans-serif';
+                        ctx.save();
+                        ctx.letterSpacing = '2.5px';
+                        ctx.fillText('REFERENCE PHOTO', x, y);
+                        ctx.restore();
+
+                        y += 18;
+                        const imgX = x, imgY = y, imgW = contentWidth, imgH = imageDisplayHeight;
+
+                        ctx.save();
+                        ctx.shadowColor = 'rgba(57,24,38,0.18)';
+                        ctx.shadowBlur = 14;
+                        ctx.shadowOffsetY = 4;
+                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 18);
+                        ctx.fillStyle = '#fff';
+                        ctx.fill();
+                        ctx.restore();
+
+                        ctx.save();
+                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 18);
+                        ctx.clip();
+                        const boxRatio = imgW / imgH;
+                        const imgRatio = refImg.width / refImg.height;
+                        let drawW, drawH, drawX, drawY;
+                        if (imgRatio > boxRatio) {
+                            drawH = imgH; drawW = imgH * imgRatio;
+                            drawX = imgX - (drawW - imgW) / 2; drawY = imgY;
+                        } else {
+                            drawW = imgW; drawH = imgW / imgRatio;
+                            drawX = imgX; drawY = imgY - (drawH - imgH) / 2;
+                        }
+                        ctx.drawImage(refImg, drawX, drawY, drawW, drawH);
+                        ctx.restore();
+
+                        ctx.strokeStyle = '#ecd8a2';
+                        ctx.lineWidth = 1.5;
+                        this.roundRect(ctx, imgX, imgY, imgW, imgH, 18);
+                        ctx.stroke();
+
+                        y += imgH + 34;
+                    }
+
+                    this.drawDivider(ctx, x, rightEdge, y, true);
+                    y += 12;
+
+                    // Total block with tinted background
+                    const totalBoxH = this.form.serviceLocation === 'home_service' ? 92 : 70;
+                    ctx.fillStyle = '#fdf2f4';
+                    this.roundRect(ctx, x, y, contentWidth, totalBoxH, 16);
+                    ctx.fill();
+
+                    y += 42;
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '600 24px "Playfair Display", serif';
+                    ctx.fillText('Estimated total', x + 20, y);
+                    ctx.textAlign = 'right';
+                    ctx.font = '700 26px "Playfair Display", serif';
+                    ctx.fillText('₱' + this.total, rightEdge - 20, y);
+                    ctx.textAlign = 'left';
+
+                    if (this.form.serviceLocation === 'home_service') {
+                        y += 24;
+                        ctx.fillStyle = '#8a4d68';
+                        ctx.font = 'italic 12px Jost, sans-serif';
+                        ctx.fillText('+ home service fee, to be confirmed by Jen', x + 20, y);
+                        y += 28;
+                    } else {
+                        y += 30;
+                    }
+
+                    y += 26;
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#8a4d68';
+                    ctx.font = '12px Jost, sans-serif';
+                    ctx.fillText('Paliparan 2, Dasmariñas, Cavite  ·  @nailsbyjen.ph', width / 2, y);
+                    ctx.textAlign = 'left';
+
+                    return canvas;
+                },
+
+                drawDivider(ctx, x1, x2, y, fancy) {
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y);
+                    ctx.lineTo(x2, y);
+                    ctx.stroke();
+                    if (fancy) {
+                        const midX = (x1 + x2) / 2;
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(midX - 10, y - 6, 20, 12);
+                        ctx.fillStyle = '#d4ab4d';
+                        ctx.font = '13px Jost, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('✦', midX, y + 4);
+                        ctx.textAlign = 'left';
+                    }
+                },
+
+                async downloadReceipt() {
+                    this.downloading = true;
+                    try {
+                        const canvas = await this.drawReceipt();
+                        const link = document.createElement('a');
+                        link.download = `booking-${(this.form.customerName || 'request').replace(/\s+/g, '-').toLowerCase()}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    } finally {
+                        this.downloading = false;
+                    }
                 },
             };
         }

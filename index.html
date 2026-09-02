@@ -6,6 +6,21 @@
     <title>Book your nails - Nails by Jen</title>
     <meta name="description" content="Book your nail appointment with Nails by Jen — Paliparan 2, Dasmariñas, Cavite.">
 
+    <!-- Favicon: a simple script "J" monogram in the site's rose/gold gradient, no image file needed -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23df4d6e'/%3E%3Cstop offset='1' stop-color='%23d4ab4d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='34' font-style='italic' font-weight='600' fill='white' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+
+    <!-- Open Graph / link preview: shown when this URL is shared on Facebook, Messenger, etc. -->
+    <!-- To use a different photo, just change the og:image / twitter:image URL below to any image already in your repo. -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Nails by Jen — Book Your Nail Appointment">
+    <meta property="og:description" content="Softgel extensions, gel polish, and nail art — Home Service or Home Base in Paliparan 2, Dasmariñas, Cavite.">
+    <meta property="og:image" content="https://tolentinojennelyn01-cloud.github.io/nailsbyjen-site/images/nail-set-1.jpg">
+    <meta property="og:url" content="https://tolentinojennelyn01-cloud.github.io/nailsbyjen-site/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Nails by Jen — Book Your Nail Appointment">
+    <meta name="twitter:description" content="Softgel extensions, gel polish, and nail art — Home Service or Home Base in Paliparan 2, Dasmariñas, Cavite.">
+    <meta name="twitter:image" content="https://tolentinojennelyn01-cloud.github.io/nailsbyjen-site/images/nail-set-1.jpg">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,8 +96,10 @@
                 <span class="text-[11px] uppercase tracking-[0.2em] text-gold-700/80 font-medium">Nailtech Beginner</span>
             </a>
             <nav class="flex items-center gap-4 text-sm">
+                <a href="#book" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Book</a>
                 <a href="#about" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">About</a>
                 <a href="#gallery" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Gallery</a>
+                <a href="#faq" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">FAQ</a>
                 <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="text-rose-500 hover:text-rose-600 transition-colors">@nailsbyjen.ph</a>
             </nav>
         </div>
@@ -95,9 +112,10 @@
             <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">A little about me</p>
             <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen 👋</h2>
             <p class="text-sm sm:text-base text-plum-400 leading-relaxed">
-                I'm a nail artist based in Paliparan 2, Dasmariñas, Cavite, just getting my nail business off the ground.
-                I put care into every set — from soft, everyday gel looks to fuller nail art — and I'm always excited to
-                bring your ideas to life. Book a slot above and let's create something you'll love showing off.
+                A little self-care, a little luxury, and nails made just for you.
+                I’m a beginner nail tech offering a cozy, home-based nail experience where every set is done with care and attention to detail. If you’re looking for simple, elegant, and beautiful nails, I’d love to have you as one of my clients.
+                Your support means so much as I continue growing my skills and turning my passion into something beautiful.
+                Book your next nail appointment with me and let’s create a set you’ll love.
             </p>
         </section>
 
@@ -132,8 +150,33 @@
             </div>
         </section>
 
+        <!-- ============ HOW IT WORKS ============ -->
+        <section class="mb-14 max-w-3xl mx-auto">
+            <div class="text-center mb-6">
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Simple as 1-2-3</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">How it works</h2>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">1</div>
+                    <p class="text-sm font-medium mb-1">Fill out the form</p>
+                    <p class="text-xs text-plum-400">Pick your service, design, and preferred date below.</p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">2</div>
+                    <p class="text-sm font-medium mb-1">Send it on Messenger</p>
+                    <p class="text-xs text-plum-400">Download your booking receipt and send it to Jen's page.</p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">3</div>
+                    <p class="text-sm font-medium mb-1">Get confirmed</p>
+                    <p class="text-xs text-plum-400">Jen confirms your slot and any details on Messenger.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- ============ BOOKING FORM ============ -->
-        <div x-show="!submitted" class="grid md:grid-cols-3 gap-8">
+        <div id="book" x-show="!submitted" class="grid md:grid-cols-3 gap-8 scroll-mt-24">
 
             <form @submit.prevent="submitBooking" class="md:col-span-2 bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
 
@@ -444,6 +487,44 @@
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
+
+        <!-- ============ FAQ / POLICIES ============ -->
+        <section id="faq" class="mt-16 max-w-2xl mx-auto scroll-mt-24">
+            <div class="text-center mb-6">
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Good to know</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">FAQ &amp; Policies</h2>
+            </div>
+            <div class="space-y-3">
+                <details class="bg-white/80 rounded-xl border border-gold-200/60 p-4 group">
+                    <summary class="font-medium text-sm cursor-pointer list-none flex items-center justify-between">
+                        Do I need to pay a deposit?
+                        <span class="text-rose-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                    </summary>
+                    <p class="text-sm text-plum-400 mt-2">Yes, a ₱50 deposit is needed to confirm your slot. Jen will share payment details once your booking is confirmed on Messenger.</p>
+                </details>
+                <details class="bg-white/80 rounded-xl border border-gold-200/60 p-4 group">
+                    <summary class="font-medium text-sm cursor-pointer list-none flex items-center justify-between">
+                        Can I reschedule or cancel?
+                        <span class="text-rose-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                    </summary>
+                    <p class="text-sm text-plum-400 mt-2">Yes — just message Jen on Facebook as soon as you know so she can adjust the schedule for other clients.</p>
+                </details>
+                <details class="bg-white/80 rounded-xl border border-gold-200/60 p-4 group">
+                    <summary class="font-medium text-sm cursor-pointer list-none flex items-center justify-between">
+                        What's the difference between Home Service and Home Base?
+                        <span class="text-rose-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                    </summary>
+                    <p class="text-sm text-plum-400 mt-2">Home Base means you come to Jen's place in Paliparan 2, Dasmariñas. Home Service means Jen travels to you, with a small travel fee based on distance, confirmed once she reviews your address.</p>
+                </details>
+                <details class="bg-white/80 rounded-xl border border-gold-200/60 p-4 group">
+                    <summary class="font-medium text-sm cursor-pointer list-none flex items-center justify-between">
+                        How do I confirm my booking?
+                        <span class="text-rose-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                    </summary>
+                    <p class="text-sm text-plum-400 mt-2">Fill out the booking form, download your receipt, and send it to Jen on Facebook Messenger. She'll confirm your date, time, and deposit details there.</p>
+                </details>
+            </div>
+        </section>
     </main>
 
     <footer class="text-center py-10">
@@ -912,5 +993,14 @@
             };
         }
     </script>
+
+    <!--
+        FREE VISIT TRACKING (GoatCounter) — see how many people visit your site.
+        1. Go to https://www.goatcounter.com and click "Sign up" (free, no credit card).
+        2. Pick a site code, e.g. "nailsbyjen" — your dashboard will be at nailsbyjen.goatcounter.com
+        3. Replace YOUR-CODE-HERE below with that site code, then commit this file.
+        4. View your stats any time by logging into goatcounter.com.
+    -->
+    <script data-goatcounter="https://YOUR-CODE-HERE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

@@ -93,13 +93,12 @@
         <!-- ============ ABOUT ============ -->
         <section id="about" class="mb-14 text-center max-w-2xl mx-auto scroll-mt-24">
             <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">A little about me</p>
-            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen </h2>
+            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen 👋</h2>
             <p class="text-sm sm:text-base text-plum-400 leading-relaxed">
-                A little self-care, a little luxury, and nails made just for you.
-                I’m a beginner nail tech offering a cozy, home-based and home service nail experience where every set is done with care and attention to detail. If you’re looking for simple, elegant, and beautiful nails, I’d love to have you as one of my clients.
-                Your support means so much as I continue growing my skills and turning my passion into something beautiful.
-                Book your next nail appointment with me and let’s create a set you’ll love.
-             </p>
+                I'm a nail artist based in Paliparan 2, Dasmariñas, Cavite, just getting my nail business off the ground.
+                I put care into every set — from soft, everyday gel looks to fuller nail art — and I'm always excited to
+                bring your ideas to life. Book a slot above and let's create something you'll love showing off.
+            </p>
         </section>
 
         <!-- ============ GALLERY ============ -->
@@ -226,18 +225,8 @@
                     </div>
                 </fieldset>
 
-                <!-- Nail length / shape / color -->
+                <!-- Nail shape / color -->
                 <fieldset class="grid sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm mb-1">Nail length preference</label>
-                        <select x-model="form.nailLength" class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
-                            <option value="">Select length</option>
-                            <option value="short">Short</option>
-                            <option value="medium">Medium</option>
-                            <option value="long">Long</option>
-                        </select>
-                        <p class="text-xs text-plum-400 mt-1">Extension pricing above already reflects short-med vs long.</p>
-                    </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm mb-2">Nail shape</label>
                         <div class="flex flex-wrap gap-3">
@@ -276,11 +265,13 @@
 
                 <!-- Full set design -->
                 <fieldset>
-                    <label class="flex items-center gap-2 mb-2 font-serif text-lg text-plum-700">
-                        <input type="checkbox" x-model="form.hasFullSetDesign" class="text-rose-500 focus:ring-rose-400">
-                        Add a Full Set Design
-                    </label>
-                    <div x-show="form.hasFullSetDesign" x-cloak class="space-y-2 pl-6">
+                    <legend class="font-serif text-lg text-plum-700 mb-2">Full Set Design (optional)</legend>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                               :class="!form.fullSetDesignType ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                            <input type="radio" name="full_set_design_type" value="" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                            <span class="text-sm">No design (plain color only)</span>
+                        </label>
                         <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
                             <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
                                    :class="form.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
@@ -370,7 +361,7 @@
                         <span x-text="'₱' + (form.baseService ? pricing.base_services[form.baseService].price : 0)"></span>
                     </div>
 
-                    <div class="flex justify-between text-sm" x-show="form.hasFullSetDesign && form.fullSetDesignType">
+                    <div class="flex justify-between text-sm" x-show="form.fullSetDesignType">
                         <span x-text="form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].label : ''"></span>
                         <span x-text="'₱' + (form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].price : 0)"></span>
                     </div>
@@ -412,7 +403,7 @@
             <div class="text-left space-y-2 text-sm bg-rose-50 rounded-xl p-4">
                 <div class="flex justify-between"><span class="text-gray-500">Name</span><span x-text="form.customerName"></span></div>
                 <div class="flex justify-between"><span class="text-gray-500">Base service</span><span x-text="pricing.base_services[form.baseService]?.label"></span></div>
-                <template x-if="form.hasFullSetDesign && form.fullSetDesignType">
+                <template x-if="form.fullSetDesignType">
                     <div class="flex justify-between"><span class="text-gray-500">Design</span><span x-text="pricing.full_set_designs[form.fullSetDesignType]?.label"></span></div>
                 </template>
                 <template x-if="form.nailColor">
@@ -468,17 +459,18 @@
 
         const pricing = {
             base_services: {
-                softgel_short_med: { label: 'Softgel Extension (short-med)', price: 299 },
-                softgel_long: { label: 'Softgel Extension (long)', price: 349 },
-                gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 269 },
+                softgel_short: { label: 'Softgel Extension (Short)', price: 299 },
+                softgel_medium: { label: 'Softgel Extension (Medium)', price: 299 },
+                softgel_long: { label: 'Softgel Extension (Long)', price: 349 },
+                gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 270 },
             },
             full_set_designs: {
-                french: { label: 'French', price: 150 },
+                french: { label: 'French', price: 200 },
                 ombre: { label: 'Ombre', price: 200 },
                 cateye: { label: 'Cat eye', price: 200 },
             },
             addons: {
-                french: { label: 'French (per nail)', price: 15 },
+                french: { label: 'French (per nail)', price: 20 },
                 ombre: { label: 'Ombre (per nail)', price: 20 },
                 nail_charms: { label: 'Nail Charms (per nail)', price: 15 },
                 rhinestones: { label: 'Rhinestones (per nail)', price: 20 },
@@ -542,10 +534,8 @@
                     serviceLocation: '',
                     serviceAddress: '',
                     baseService: '',
-                    nailLength: '',
                     nailShape: '',
                     nailColor: '',
-                    hasFullSetDesign: false,
                     fullSetDesignType: '',
                     addons: {},
                     removalOption: '',
@@ -577,7 +567,7 @@
                     if (this.form.baseService && pricing.base_services[this.form.baseService]) {
                         sum += pricing.base_services[this.form.baseService].price;
                     }
-                    if (this.form.hasFullSetDesign && this.form.fullSetDesignType && pricing.full_set_designs[this.form.fullSetDesignType]) {
+                    if (this.form.fullSetDesignType && pricing.full_set_designs[this.form.fullSetDesignType]) {
                         sum += pricing.full_set_designs[this.form.fullSetDesignType].price;
                     }
                     for (const [key, qty] of Object.entries(this.form.addons)) {
@@ -594,7 +584,7 @@
                 get summaryText() {
                     const f = this.form;
                     const lines = [
-                        ` New booking request`,
+                        `💅 New booking request`,
                         `Name: ${f.customerName}`,
                         `Contact: ${f.contactNumber}`,
                     ];
@@ -604,10 +594,9 @@
                     lines.push(`Location: ${f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base'}`);
                     if (f.serviceAddress) lines.push(`Address: ${f.serviceAddress}`);
                     lines.push(`Base service: ${pricing.base_services[f.baseService]?.label || ''}`);
-                    if (f.nailLength) lines.push(`Nail length: ${f.nailLength}`);
                     if (f.nailShape) lines.push(`Nail shape: ${f.nailShape}`);
                     if (f.nailColor) lines.push(`Nail color: ${f.nailColor}`);
-                    if (f.hasFullSetDesign && f.fullSetDesignType) lines.push(`Full set design: ${pricing.full_set_designs[f.fullSetDesignType]?.label}`);
+                    if (f.fullSetDesignType) lines.push(`Full set design: ${pricing.full_set_designs[f.fullSetDesignType]?.label}`);
                     const addonLines = Object.entries(f.addons)
                         .filter(([, qty]) => qty > 0)
                         .map(([key, qty]) => `  - ${pricing.addons[key]?.label} × ${qty}`);
@@ -645,10 +634,9 @@
                     rows.push(['Location', f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base']);
                     if (f.serviceAddress) rows.push(['Address', f.serviceAddress]);
                     rows.push(['Base service', pricing.base_services[f.baseService]?.label || '']);
-                    if (f.nailLength) rows.push(['Nail length', f.nailLength]);
                     if (f.nailShape) rows.push(['Nail shape', f.nailShape]);
                     if (f.nailColor) rows.push(['Nail color', f.nailColor]);
-                    if (f.hasFullSetDesign && f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
+                    if (f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
                     Object.entries(f.addons).filter(([, qty]) => qty > 0).forEach(([key, qty]) => {
                         rows.push([pricing.addons[key]?.label, `× ${qty}`]);
                     });

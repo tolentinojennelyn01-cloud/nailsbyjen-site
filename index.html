@@ -437,7 +437,7 @@
         </div>
 
         <!-- ============ CONFIRMATION ============ -->
-        <div x-show="submitted" x-cloak class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
+        <div x-ref="confirmationBlock" x-show="submitted" x-cloak class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
             <div class="text-4xl mb-2">💖</div>
             <h1 class="text-xl font-bold text-rose-600 mb-1">Booking request ready!</h1>
             <p class="text-sm text-gray-500 mb-6">Tap below to send it to Jen on Facebook Messenger — she'll confirm your schedule there.</p>
@@ -573,7 +573,7 @@
                 gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 270 },
             },
             full_set_designs: {
-                french: { label: 'French', price: 200 },
+                french: { label: 'French', price: 150 },
                 ombre: { label: 'Ombre', price: 200 },
                 cateye: { label: 'Cat eye', price: 200 },
             },
@@ -724,7 +724,9 @@
 
                 submitBooking() {
                     this.submitted = true;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    this.$nextTick(() => {
+                        this.$refs.confirmationBlock?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
                 },
 
                 copySummary() {

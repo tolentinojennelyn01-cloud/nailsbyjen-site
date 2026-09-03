@@ -24,7 +24,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Jost:wght@300;400;500;600&family=Alex+Brush&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
 
     <!-- Tailwind via CDN -- no build step needed, works great on GitHub Pages -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,7 +48,7 @@
                         },
                     },
                     fontFamily: {
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        serif: ['"Bookman Old Style"', '"URW Bookman"', 'Georgia', 'serif'],
                         sans: ['"Bookman Old Style"', '"URW Bookman"', 'Georgia', 'serif'],
                         script: ['"Alex Brush"', 'cursive'],
                     },
@@ -110,12 +110,11 @@
         <!-- ============ ABOUT ============ -->
         <section id="about" class="mb-14 text-center max-w-2xl mx-auto scroll-mt-24">
             <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">A little about me</p>
-            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen!</h2>
+            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-4">Hi, I'm Jen 👋</h2>
             <p class="text-sm sm:text-base text-plum-400 leading-relaxed">
-            A little self-care, a little luxury, and nails made just for you.
-            I’m a beginner nail tech offering a cozy, home-based nail experience where every set is done with care and attention to detail. If you’re looking for simple, elegant, and beautiful nails, I’d love to have you as one of my clients.
-            Your support means so much as I continue growing my skills and turning my passion into something beautiful.
-            Book your next nail appointment with me and let’s create a set you’ll love.
+                I'm a nail artist based in Paliparan 2, Dasmariñas, Cavite, just getting my nail business off the ground.
+                I put care into every set — from soft, everyday gel looks to fuller nail art — and I'm always excited to
+                bring your ideas to life. Book a slot above and let's create something you'll love showing off.
             </p>
         </section>
 
@@ -472,18 +471,46 @@
 
             <div class="mt-6 space-y-3">
                 <button type="button" @click="downloadReceipt" class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    <span x-text="downloading ? 'Preparing image…' : '1. Download booking receipt'"></span>
+                    <span x-text="downloading ? 'Preparing image…' : '1. Show booking receipt'"></span>
                 </button>
-                <a :href="messengerLink" target="_blank" @click="downloadReceipt"
+                <a :href="messengerLink" target="_blank"
                    class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
                     2. Open Messenger to send it
                 </a>
                 <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
                     <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Step 1 saves a picture of your booking (with your reference photo, if you added one) to your device. Step 2 opens Messenger — attach that picture there.</p>
+                <p class="text-xs text-plum-400">Step 1 shows your receipt as a picture. Step 2 opens Messenger — attach that picture there.</p>
             </div>
             <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
+
+            <!-- ============ RECEIPT IMAGE MODAL (works on every device, incl. phones) ============ -->
+            <div x-show="showReceiptModal" x-cloak
+                 class="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4"
+                 @click.self="showReceiptModal = false">
+                <div class="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[92vh] overflow-y-auto p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <p class="font-serif font-semibold text-rose-600">Your booking receipt</p>
+                        <button type="button" @click="showReceiptModal = false" class="text-plum-400 hover:text-rose-500 text-xl leading-none px-2">&times;</button>
+                    </div>
+
+                    <img :src="receiptImageUrl" alt="Booking receipt" class="w-full rounded-xl border border-gold-200/60 shadow-sm">
+
+                    <div class="bg-rose-50 rounded-xl p-3 text-xs text-plum-600 space-y-1">
+                        <p><strong>On your phone:</strong> press and hold the picture above, then tap "Save Image" or "Download image."</p>
+                        <p><strong>On a computer:</strong> right-click the picture and choose "Save image as…"</p>
+                    </div>
+
+                    <a :href="receiptImageUrl" :download="receiptFileName"
+                       class="block w-full text-center bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all">
+                        Try direct download
+                    </a>
+                    <a :href="messengerLink" target="_blank"
+                       class="block w-full text-center border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3 hover:bg-rose-50 transition-all">
+                        Open Messenger
+                    </a>
+                </div>
+            </div>
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
@@ -546,19 +573,19 @@
                 gel_polish_only: { label: 'Gel Polish Only (natural nails)', price: 270 },
             },
             full_set_designs: {
-                french: { label: 'French', price: 150 },
+                french: { label: 'French', price: 200 },
                 ombre: { label: 'Ombre', price: 200 },
                 cateye: { label: 'Cat eye', price: 200 },
             },
             addons: {
-                french: { label: 'French (per nail)', price: 15 },
+                french: { label: 'French (per nail)', price: 20 },
                 ombre: { label: 'Ombre (per nail)', price: 20 },
                 nail_charms: { label: 'Nail Charms (per nail)', price: 15 },
-                rhinestones: { label: 'Rhinestones (per nail)', price: 15 },
-                '3d_flower': { label: '3D Flower (per nail)', price: 10 },
-                '3d_nail_art': { label: '3D Nail Art (per nail)', price: 10 },
-                nail_art: { label: 'Nail Art (per nail, avg)', price: 20 },
-                blooming_gel: { label: 'Blooming Gel (per nail)', price: 15 },
+                rhinestones: { label: 'Rhinestones (per nail)', price: 20 },
+                '3d_flower': { label: '3D Flower (per nail)', price: 20 },
+                '3d_nail_art': { label: '3D Nail Art (per nail)', price: 20 },
+                nail_art: { label: 'Nail Art (per nail, avg)', price: 25 },
+                blooming_gel: { label: 'Blooming Gel (per nail)', price: 20 },
                 cat_eye_addon: { label: 'Cat Eye (per nail)', price: 20 },
             },
             removal: {
@@ -595,6 +622,9 @@
                 submitted: false,
                 copied: false,
                 downloading: false,
+                showReceiptModal: false,
+                receiptImageUrl: null,
+                receiptFileName: 'booking-receipt.png',
                 fileName: '',
                 referenceImageDataUrl: null,
                 lightboxIndex: null,
@@ -769,10 +799,7 @@
                     if (document.fonts && document.fonts.ready) {
                         try {
                             await document.fonts.load('600 44px "Alex Brush"');
-                            await document.fonts.load('600 26px "Playfair Display"');
-                            await document.fonts.load('600 16px "Jost"');
-                            await document.fonts.load('16px "Jost"');
-                            await document.fonts.ready;
+                                                        await document.fonts.ready;
                         } catch (e) { /* fonts best-effort */ }
                     }
 
@@ -798,7 +825,7 @@
                         imageDisplayHeight = Math.round(refImg.height * scale);
                     }
 
-                    ctx.font = '15px Jost, sans-serif';
+                    ctx.font = '15px "Bookman Old Style", Georgia, serif';
                     let measuredHeight = 250; // header block
                     rows.forEach(([label, value]) => {
                         const lines = this.wrapText(ctx, value, valueMaxWidth);
@@ -851,7 +878,7 @@
 
                     y += 30;
                     ctx.fillStyle = '#c2953a';
-                    ctx.font = '600 12px Jost, sans-serif';
+                    ctx.font = '600 12px "Bookman Old Style", Georgia, serif';
                     ctx.save();
                     ctx.letterSpacing = '3px';
                     ctx.fillText('BOOKING REQUEST', width / 2, y);
@@ -864,11 +891,11 @@
                     y += 38;
                     rows.forEach(([label, value]) => {
                         ctx.fillStyle = '#a3792d';
-                        ctx.font = '13px Jost, sans-serif';
+                        ctx.font = '13px "Bookman Old Style", Georgia, serif';
                         ctx.fillText(String(label).toUpperCase(), x, y);
 
                         ctx.fillStyle = '#391826';
-                        ctx.font = '600 16px Jost, sans-serif';
+                        ctx.font = '600 16px "Bookman Old Style", Georgia, serif';
                         const lines = this.wrapText(ctx, value, valueMaxWidth);
                         lines.forEach((line, i) => {
                             ctx.fillText(line, x + labelColWidth, y + i * rowLineHeight);
@@ -879,7 +906,7 @@
                     if (refImg) {
                         y += 6;
                         ctx.fillStyle = '#c2953a';
-                        ctx.font = '600 12px Jost, sans-serif';
+                        ctx.font = '600 12px "Bookman Old Style", Georgia, serif';
                         ctx.save();
                         ctx.letterSpacing = '2.5px';
                         ctx.fillText('REFERENCE PHOTO', x, y);
@@ -932,17 +959,17 @@
 
                     y += 42;
                     ctx.fillStyle = '#c22e51';
-                    ctx.font = '600 24px "Playfair Display", serif';
+                    ctx.font = '600 24px "Bookman Old Style", Georgia, serif';
                     ctx.fillText('Estimated total', x + 20, y);
                     ctx.textAlign = 'right';
-                    ctx.font = '700 26px "Playfair Display", serif';
+                    ctx.font = '700 26px "Bookman Old Style", Georgia, serif';
                     ctx.fillText('₱' + this.total, rightEdge - 20, y);
                     ctx.textAlign = 'left';
 
                     if (this.form.serviceLocation === 'home_service') {
                         y += 24;
                         ctx.fillStyle = '#8a4d68';
-                        ctx.font = 'italic 12px Jost, sans-serif';
+                        ctx.font = 'italic 12px "Bookman Old Style", Georgia, serif';
                         ctx.fillText('+ home service fee, to be confirmed by Jen', x + 20, y);
                         y += 28;
                     } else {
@@ -952,7 +979,7 @@
                     y += 26;
                     ctx.textAlign = 'center';
                     ctx.fillStyle = '#8a4d68';
-                    ctx.font = '12px Jost, sans-serif';
+                    ctx.font = '12px "Bookman Old Style", Georgia, serif';
                     ctx.fillText('Paliparan 2, Dasmariñas, Cavite  ·  @nailsbyjen.ph', width / 2, y);
                     ctx.textAlign = 'left';
 
@@ -971,7 +998,7 @@
                         ctx.fillStyle = '#fff';
                         ctx.fillRect(midX - 10, y - 6, 20, 12);
                         ctx.fillStyle = '#d4ab4d';
-                        ctx.font = '13px Jost, sans-serif';
+                        ctx.font = '13px "Bookman Old Style", Georgia, serif';
                         ctx.textAlign = 'center';
                         ctx.fillText('✦', midX, y + 4);
                         ctx.textAlign = 'left';
@@ -982,10 +1009,9 @@
                     this.downloading = true;
                     try {
                         const canvas = await this.drawReceipt();
-                        const link = document.createElement('a');
-                        link.download = `booking-${(this.form.customerName || 'request').replace(/\s+/g, '-').toLowerCase()}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
+                        this.receiptFileName = `booking-${(this.form.customerName || 'request').replace(/\s+/g, '-').toLowerCase()}.png`;
+                        this.receiptImageUrl = canvas.toDataURL('image/png');
+                        this.showReceiptModal = true;
                     } finally {
                         this.downloading = false;
                     }
@@ -1002,9 +1028,5 @@
         4. View your stats any time by logging into goatcounter.com.
     -->
     <script data-goatcounter="https://nailsbyjen.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-    <!-- Cloudflare Web Analytics (free, privacy-friendly — no cookies, no personal data collected).
-         Replace YOUR-TOKEN-HERE below with the token from your Cloudflare Web Analytics dashboard.
-         See setup steps: https://developers.cloudflare.com/web-analytics/get-started/ -->
-    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ab3573622cd34b2e9e5d080e0d65dc6e"}'></script>
 </body>
 </html>

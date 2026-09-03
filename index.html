@@ -65,6 +65,8 @@
 
     <style>
         [x-cloak] { display: none !important; }
+        @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        body { animation: pageFadeIn 0.5s ease-out; }
         body {
             font-family: 'Bookman Old Style', 'URW Bookman', Georgia, serif;
             background-color: #fdf2f4;
@@ -104,6 +106,27 @@
             </nav>
         </div>
     </header>
+
+    <div class="bg-rose-50/70 border-b border-gold-200/40 text-center py-2 px-4">
+        <p class="text-xs text-plum-500">
+            <span>🗓️ Bookings open <strong>weekends &amp; holidays</strong></span>
+            <span class="mx-2 text-gold-400">·</span>
+            <a href="https://wa.me/639693661029" target="_blank" class="text-rose-500 hover:text-rose-600 underline">💬 Also on WhatsApp</a>
+        </p>
+    </div>
+
+    <!-- Sticky "Book Now" button, mobile only, hidden once you're actually at the booking form -->
+    <a href="#book" x-data="{ show: true }" x-init="
+            const bookEl = document.getElementById('book');
+            if (bookEl) {
+                const obs = new IntersectionObserver((entries) => { show = !entries[0].isIntersecting; }, { threshold: 0.05 });
+                obs.observe(bookEl);
+            }
+        "
+       x-show="show"
+       class="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white text-sm font-medium tracking-wide uppercase px-6 py-3 rounded-full shadow-glam">
+        Book Now
+    </a>
 
     <main class="max-w-4xl mx-auto px-4 py-10" x-data="bookingPage()">
 
@@ -516,10 +539,14 @@
                    class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
                     2. Open Messenger to send it
                 </a>
+                <a :href="whatsappLink" target="_blank"
+                   class="block w-full text-center text-xs text-plum-400 hover:text-rose-500 underline">
+                    Prefer WhatsApp instead?
+                </a>
                 <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
                     <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Step 1 shows your receipt as a picture. Step 2 opens Messenger — attach that picture there.</p>
+                <p class="text-xs text-plum-400">Step 1 shows your receipt as a picture. Step 2 opens Messenger (or WhatsApp) — attach that picture there.</p>
             </div>
             <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
@@ -566,7 +593,8 @@
                         Do I need to pay a deposit?
                         <span class="text-rose-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
                     </summary>
-                    <p class="text-sm text-plum-400 mt-2">Yes, a ₱50 deposit is needed to confirm your slot. Jen will share payment details once your booking is confirmed on Messenger.</p>
+                    <p class="text-sm text-plum-400 mt-2 mb-3">Yes, a ₱50 deposit is needed to confirm your slot, payable via GCash. You can scan the QR code below any time.</p>
+                    <img src="images/gcash-qr.jpg" alt="GCash QR code" class="w-40 mx-auto rounded-xl border border-gold-200/60 cursor-zoom-in" @click="openGuide('images/gcash-qr.jpg', 'GCash — Scan to Pay')">
                 </details>
                 <details class="bg-white/80 rounded-xl border border-gold-200/60 p-4 group">
                     <summary class="font-medium text-sm cursor-pointer list-none flex items-center justify-between">
@@ -603,6 +631,7 @@
     <script>
         // ── Edit this to point at your own Facebook Page username ──
         const FACEBOOK_USERNAME = '61593421694869';
+        const WHATSAPP_NUMBER = '639693661029';
 
         const pricing = {
             base_services: {
@@ -823,6 +852,10 @@
 
                 get messengerLink() {
                     return `https://m.me/${FACEBOOK_USERNAME}?text=${encodeURIComponent(this.summaryText)}`;
+                },
+
+                get whatsappLink() {
+                    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(this.summaryText)}`;
                 },
 
                 submitBooking() {

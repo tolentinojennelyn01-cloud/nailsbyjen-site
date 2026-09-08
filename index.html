@@ -126,6 +126,7 @@
                 <span class="text-[11px] uppercase tracking-[0.2em] text-gold-700/80 font-medium">Nailtech Beginner</span>
             </a>
             <nav class="flex items-center gap-4 text-sm">
+                <a href="#calculator" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Calculator</a>
                 <a href="#book" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Book</a>
                 <a href="#about" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">About</a>
                 <a href="#gallery" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors">Gallery</a>
@@ -653,6 +654,155 @@
                 </details>
             </div>
         </section>
+
+        <!-- ============ PRICE CALCULATOR (private, password-gated) ============ -->
+        <section id="calculator" class="mt-16 scroll-mt-24">
+            <div class="text-center mb-6">
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">🔒 Private</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Price Calculator</h2>
+            </div>
+
+            <!-- Locked view -->
+            <div x-show="!calculatorUnlocked" class="max-w-xs mx-auto bg-white/90 rounded-2xl shadow-glam border border-gold-200/60 p-6 text-center space-y-3">
+                <p class="text-sm text-plum-400">This tool is just for Jen. Enter the password to continue.</p>
+                <input type="password" x-model="calculatorPasswordInput" @keyup.enter="unlockCalculator"
+                       placeholder="Password"
+                       class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400 text-center">
+                <p x-show="calculatorError" x-cloak class="text-xs text-rose-500">Incorrect password, try again.</p>
+                <button type="button" @click="unlockCalculator" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-2.5 shadow-glam transition-all">
+                    Unlock
+                </button>
+            </div>
+
+            <!-- Unlocked calculator -->
+            <div x-show="calculatorUnlocked" x-cloak class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-2 bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
+
+                    <fieldset>
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Base service</legend>
+                        <div class="space-y-2">
+                            <template x-for="[key, item] in Object.entries(pricing.base_services)" :key="key">
+                                <label class="flex items-center justify-between border rounded-xl px-4 py-3 cursor-pointer transition-colors"
+                                       :class="form.baseService === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                    <span class="flex items-center gap-3">
+                                        <input type="radio" name="calc_base_service" :value="key" x-model="form.baseService" class="text-rose-500 focus:ring-rose-400">
+                                        <span x-text="item.label"></span>
+                                    </span>
+                                    <span class="text-sm text-plum-400">₱<span x-text="item.price"></span></span>
+                                </label>
+                            </template>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Full Set Design (optional)</legend>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                                   :class="!form.fullSetDesignType ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                <input type="radio" name="calc_full_set_design_type" value="" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                                <span class="text-sm">No design (plain color only)</span>
+                            </label>
+                            <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
+                                <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                                       :class="form.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                    <span class="flex items-center gap-3">
+                                        <input type="radio" name="calc_full_set_design_type" :value="key" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                                        <span x-text="item.label"></span>
+                                    </span>
+                                    <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
+                                </label>
+                            </template>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Per-nail add-ons</legend>
+                        <div class="space-y-2">
+                            <template x-for="[key, item] in Object.entries(pricing.addons)" :key="key">
+                                <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2">
+                                    <div>
+                                        <p x-text="item.label" class="text-sm"></p>
+                                        <p class="text-xs text-plum-400">₱<span x-text="item.price"></span> per nail</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="form.addons[key] = Math.max(0, (form.addons[key]||0) - 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">−</button>
+                                        <input type="number" x-model.number="form.addons[key]" min="0" max="10"
+                                            class="w-12 text-center rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                                        <button type="button" @click="form.addons[key] = Math.min(10, (form.addons[key]||0) + 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">+</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Removal (if applicable)</legend>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="calc_removal_option" value="" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                                No removal needed
+                            </label>
+                            <template x-for="[key, item] in Object.entries(pricing.removal)" :key="key">
+                                <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
+                                       :class="form.removalOption === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                    <span class="flex items-center gap-3">
+                                        <input type="radio" name="calc_removal_option" :value="key" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                                        <span x-text="item.label"></span>
+                                    </span>
+                                    <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
+                                </label>
+                            </template>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" :checked="form.serviceLocation === 'home_service'"
+                                   @change="form.serviceLocation = $event.target.checked ? 'home_service' : ''"
+                                   class="text-rose-500 focus:ring-rose-400 rounded">
+                            <span class="text-sm">Home Service (travel fee applies, TBD)</span>
+                        </label>
+                    </fieldset>
+                </div>
+
+                <aside class="md:col-span-1">
+                    <div class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sticky top-6 space-y-3">
+                        <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Quote total</p>
+                        <h3 class="font-serif text-xl font-semibold text-rose-600 mb-2">Estimated total</h3>
+
+                        <div class="flex justify-between text-sm" x-show="form.baseService">
+                            <span x-text="form.baseService ? pricing.base_services[form.baseService].label : ''"></span>
+                            <span x-text="'₱' + (form.baseService ? pricing.base_services[form.baseService].price : 0)"></span>
+                        </div>
+                        <div class="flex justify-between text-sm" x-show="form.fullSetDesignType">
+                            <span x-text="form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].label : ''"></span>
+                            <span x-text="'₱' + (form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].price : 0)"></span>
+                        </div>
+                        <template x-for="[key, qty] in Object.entries(form.addons)" :key="key">
+                            <div class="flex justify-between text-sm" x-show="qty > 0">
+                                <span x-text="pricing.addons[key]?.label + ' × ' + qty"></span>
+                                <span x-text="'₱' + (pricing.addons[key]?.price * qty)"></span>
+                            </div>
+                        </template>
+                        <div class="flex justify-between text-sm" x-show="form.removalOption">
+                            <span x-text="form.removalOption ? pricing.removal[form.removalOption].label : ''"></span>
+                            <span x-text="'₱' + (form.removalOption ? pricing.removal[form.removalOption].price : 0)"></span>
+                        </div>
+                        <div class="flex justify-between text-sm text-plum-400 italic" x-show="form.serviceLocation === 'home_service'">
+                            <span>Home service fee</span>
+                            <span>TBD</span>
+                        </div>
+
+                        <hr class="border-gold-200">
+                        <div class="flex justify-between font-serif font-semibold text-xl text-rose-600">
+                            <span>Total</span>
+                            <span x-text="'₱' + total"></span>
+                        </div>
+                        <button type="button" @click="calculatorUnlocked = false" class="w-full text-center text-xs text-plum-400 hover:text-rose-500 underline mt-2">Lock again</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
     </main>
 
     <footer class="text-center py-10">
@@ -787,6 +937,9 @@
                 receiptImageUrl: null,
                 receiptFileName: 'booking-receipt.png',
                 guideModal: { open: false, src: '', title: '' },
+                calculatorUnlocked: false,
+                calculatorPasswordInput: '',
+                calculatorError: false,
                 fileName: '',
                 referenceImageDataUrl: null,
                 lightboxIndex: null,
@@ -824,6 +977,16 @@
 
                 openGuide(src, title) {
                     this.guideModal = { open: true, src, title };
+                },
+
+                unlockCalculator() {
+                    if (this.calculatorPasswordInput === 'jen12345') {
+                        this.calculatorUnlocked = true;
+                        this.calculatorError = false;
+                        this.calculatorPasswordInput = '';
+                    } else {
+                        this.calculatorError = true;
+                    }
                 },
 
                 handleReferenceFile(event) {

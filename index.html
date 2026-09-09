@@ -103,6 +103,15 @@
     </script>
 
     <!-- Alpine.js for the reactive price calculator, no build step needed -->
+    <!-- Capture the browser's native "install" prompt (Android/Chrome) if it fires, so our button can trigger it -->
+    <script>
+        window.deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredInstallPrompt = e;
+        });
+    </script>
+
     <!-- Shared language toggle (EN / Tagalog), available everywhere via $store.site -->
     <script>
         document.addEventListener('alpine:init', () => {
@@ -166,7 +175,7 @@
                 </a>
                 <button type="button" @click="$store.site.toggle()"
                         class="text-xs font-medium border border-gold-300 text-gold-700 rounded-full px-2.5 py-1 hover:bg-gold-50 transition-colors">
-                    <span x-text="$store.site.lang === 'en' ? 'TL' : 'EN'"></span>
+                    <span x-text="$store.site.lang === 'en' ? 'TL' : 'EN'">TL</span>
                 </button>
             </nav>
         </div>
@@ -202,6 +211,44 @@
                 <span class="w-2 h-2 rounded-full bg-gray-400"></span>
                 <span x-text="$store.site.lang === 'en' ? 'Bookings open weekends & holidays' : 'Bukas ang booking tuwing weekend at holiday'"></span>
             </span>
+        </div>
+
+        <!-- ============ ADD TO HOME SCREEN ============ -->
+        <div class="flex justify-center mb-8 -mt-4">
+            <button type="button" @click="installApp"
+                    class="inline-flex items-center gap-1.5 text-xs text-gold-700 hover:text-gold-800 underline">
+                📲 <span x-text="$store.site.lang === 'en' ? 'Add to Home Screen' : 'Idagdag sa Home Screen'"></span>
+            </button>
+        </div>
+
+        <!-- ============ ADD TO HOME SCREEN GUIDE MODAL ============ -->
+        <div x-show="showInstallGuide" x-cloak
+             class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+             @click.self="showInstallGuide = false">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <p class="font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'Add to Home Screen' : 'Idagdag sa Home Screen'"></p>
+                    <button type="button" @click="showInstallGuide = false" class="text-plum-400 hover:text-rose-500 text-xl leading-none px-2">&times;</button>
+                </div>
+
+                <div x-show="isIOSDevice">
+                    <p class="text-xs text-gold-600 uppercase tracking-wide mb-2 font-medium">iPhone / iPad (Safari)</p>
+                    <ol class="text-sm text-plum-500 space-y-2 list-decimal list-inside">
+                        <li x-text="$store.site.lang === 'en' ? 'Tap the Share icon at the bottom of the screen.' : 'I-tap ang Share icon sa ibaba ng screen.'"></li>
+                        <li x-text="$store.site.lang === 'en' ? 'Scroll down and tap \'Add to Home Screen.\'' : 'Mag-scroll pababa at i-tap ang \'Add to Home Screen.\''"></li>
+                        <li x-text="$store.site.lang === 'en' ? 'Tap \'Add\' in the top-right corner.' : 'I-tap ang \'Add\' sa taas-kanan.'"></li>
+                    </ol>
+                </div>
+
+                <div x-show="!isIOSDevice">
+                    <p class="text-xs text-gold-600 uppercase tracking-wide mb-2 font-medium">Android (Chrome)</p>
+                    <ol class="text-sm text-plum-500 space-y-2 list-decimal list-inside">
+                        <li x-text="$store.site.lang === 'en' ? 'Tap the three dots (⋮) in the top-right corner.' : 'I-tap ang tatlong tuldok (⋮) sa taas-kanan.'"></li>
+                        <li x-text="$store.site.lang === 'en' ? 'Tap \'Add to Home screen\' or \'Install app.\'' : 'I-tap ang \'Add to Home screen\' o \'Install app.\''"></li>
+                        <li x-text="$store.site.lang === 'en' ? 'Confirm — the icon will appear on your home screen.' : 'I-confirm — lalabas ang icon sa home screen mo.'"></li>
+                    </ol>
+                </div>
+            </div>
         </div>
 
         <!-- ============ ABOUT ============ -->
@@ -1003,6 +1050,8 @@
                 receiptFileName: 'booking-receipt.png',
                 guideModal: { open: false, src: '', title: '' },
                 calculatorUnlocked: false,
+                showInstallGuide: false,
+                isIOSDevice: /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream,
                 calculatorPasswordInput: '',
                 calculatorError: false,
                 fileName: '',
@@ -1051,6 +1100,19 @@
                         this.calculatorPasswordInput = '';
                     } else {
                         this.calculatorError = true;
+                    }
+                },
+
+                installApp() {
+                    // Chrome/Android: trigger the real native install prompt if the browser offered one
+                    if (window.deferredInstallPrompt) {
+                        window.deferredInstallPrompt.prompt();
+                        window.deferredInstallPrompt.userChoice.finally(() => {
+                            window.deferredInstallPrompt = null;
+                        });
+                    } else {
+                        // iOS Safari (and any browser without native support): show manual steps
+                        this.showInstallGuide = true;
                     }
                 },
 

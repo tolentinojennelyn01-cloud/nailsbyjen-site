@@ -1,0 +1,12 @@
+{
+  "name": "Nails by Jen — Book Your Nail Appointment",
+  "short_name": "Nails by Jen",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fdf2f4",
+  "theme_color": "#df4d6e",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

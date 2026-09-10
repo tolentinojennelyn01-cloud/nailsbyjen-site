@@ -117,7 +117,10 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('site', {
                 lang: 'en',
-                toggle() { this.lang = this.lang === 'en' ? 'tl' : 'en'; },
+                toggle() {
+                    this.lang = this.lang === 'en' ? 'tl' : 'en';
+                    document.documentElement.lang = this.lang;
+                },
             });
         });
     </script>
@@ -199,6 +202,8 @@
 
     <main class="max-w-4xl mx-auto px-4 py-10">
 
+        <h1 class="sr-only">Nails by Jen — Jen Nail Artistry, Paliparan 2, Dasmariñas, Cavite</h1>
+
         <!-- ============ LOGO ============ -->
         <div class="flex justify-center mb-10">
             <img src="images/logo.png" alt="Jenneyn Tolentino — Nail Artist" class="w-full max-w-xl h-auto">
@@ -278,14 +283,18 @@
 
             <!-- Lightbox -->
             <div x-show="lightboxIndex !== null" x-cloak
+                 role="dialog" aria-modal="true" aria-label="Nail set photo viewer"
                  class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-                 @click.self="lightboxIndex = null" @keydown.window.escape="lightboxIndex = null">
-                <button type="button" @click="lightboxIndex = null" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
+                 @click.self="lightboxIndex = null"
+                 @keydown.window.escape="lightboxIndex = null"
+                 @keydown.window.arrow-left="if (lightboxIndex !== null) lightboxIndex = (lightboxIndex + galleryImages.length - 1) % galleryImages.length"
+                 @keydown.window.arrow-right="if (lightboxIndex !== null) lightboxIndex = (lightboxIndex + 1) % galleryImages.length">
+                <button type="button" @click="lightboxIndex = null" aria-label="Close photo viewer" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
                 <button type="button" @click.stop="lightboxIndex = (lightboxIndex + galleryImages.length - 1) % galleryImages.length"
-                        class="absolute left-3 sm:left-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8249;</button>
+                        aria-label="Previous photo" class="absolute left-3 sm:left-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8249;</button>
                 <img :src="galleryImages[lightboxIndex]" alt="Enlarged nail set photo" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
                 <button type="button" @click.stop="lightboxIndex = (lightboxIndex + 1) % galleryImages.length"
-                        class="absolute right-3 sm:right-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8250;</button>
+                        aria-label="Next photo" class="absolute right-3 sm:right-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8250;</button>
             </div>
         </section>
 
@@ -321,7 +330,7 @@
 
                 <div>
                     <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Reserve your appointment' : 'I-reserve ang appointment'"></p>
-                    <h1 class="text-3xl font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'Book your nails' : 'Mag-book ng nails'"></h1>
+                    <h2 class="text-3xl font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'Book your nails' : 'Mag-book ng nails'"></h2>
                     <p class="text-sm text-plum-400 mt-2" x-text="$store.site.lang === 'en' ? 'Fill this out, then send it to Jen on Facebook/Messenger to confirm your slot.' : 'Punan ito, pagkatapos ipadala kay Jen sa Facebook/Messenger para ma-confirm ang slot.'"></p>
                 </div>
 
@@ -617,7 +626,7 @@
         <!-- ============ CONFIRMATION ============ -->
         <div x-ref="confirmationBlock" x-show="submitted" x-cloak class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
             <div class="text-4xl mb-2">💖</div>
-            <h1 class="text-xl font-bold text-rose-600 mb-1" x-text="$store.site.lang === 'en' ? 'Booking request ready!' : 'Handa na ang booking request!'"></h1>
+            <h2 class="text-xl font-bold text-rose-600 mb-1" x-text="$store.site.lang === 'en' ? 'Booking request ready!' : 'Handa na ang booking request!'"></h2>
             <p class="text-sm text-gray-500 mb-6" x-text="$store.site.lang === 'en' ? 'Tap below to send it to Jen on Facebook Messenger — she\'ll confirm your schedule there.' : 'I-tap sa ibaba para ipadala kay Jen sa Facebook Messenger — doon niya kukumpirmahin ang schedule mo.'"></p>
 
             <div class="text-left space-y-2 text-sm bg-rose-50 rounded-xl p-4">

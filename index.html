@@ -345,7 +345,7 @@
                 <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
                     <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">1</div>
                     <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Fill out the form' : 'Punan ang form'"></p>
-                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Pick your service, design, and preferred date below.' : 'Piliin ang service, disenyo, at petsa sa ibaba.'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Share your details, design inspo, and preferred date below.' : 'Ilagay ang detalye, design inspo, at petsa sa ibaba.'"></p>
                 </div>
                 <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
                     <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">2</div>
@@ -355,15 +355,15 @@
                 <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
                     <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 font-serif font-semibold flex items-center justify-center mx-auto mb-3">3</div>
                     <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Get confirmed' : 'Ma-confirm ang slot'"></p>
-                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Jen confirms your slot and any details on Messenger.' : 'Kukumpirmahin ni Jen ang slot at detalye sa Messenger.'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Jen confirms your slot and total price on Messenger.' : 'Kukumpirmahin ni Jen ang slot at total na presyo sa Messenger.'"></p>
                 </div>
             </div>
         </section>
 
         <!-- ============ BOOKING FORM ============ -->
-        <div id="book" x-show="!submitted" class="grid md:grid-cols-3 gap-8 scroll-mt-24">
+        <div id="book" x-show="!submitted" class="max-w-2xl mx-auto scroll-mt-24">
 
-            <form @submit.prevent="submitBooking" class="md:col-span-2 bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
+            <form @submit.prevent="submitBooking" class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
 
                 <div>
                     <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Reserve your appointment' : 'I-reserve ang appointment'"></p>
@@ -436,149 +436,20 @@
                     </div>
                 </fieldset>
 
-                <!-- Base service -->
-                <fieldset>
-                    <legend class="font-serif text-lg text-plum-700 mb-2">Base service</legend>
-                    <div class="space-y-2">
-                        <template x-for="[key, item] in Object.entries(pricing.base_services)" :key="key">
-                            <label class="flex items-center justify-between border rounded-xl px-4 py-3 cursor-pointer transition-colors"
-                                   :class="form.baseService === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
-                                <span class="flex items-center gap-3">
-                                    <input type="radio" name="base_service" :value="key" x-model="form.baseService" required class="text-rose-500 focus:ring-rose-400">
-                                    <span x-text="item.label"></span>
-                                </span>
-                                <span class="text-sm text-plum-400">₱<span x-text="item.price"></span></span>
-                            </label>
+                <!-- Guide images (reference only, nothing to pick or calculate) -->
+                <div>
+                    <p class="font-serif text-lg text-plum-700 mb-1">Need ideas?</p>
+                    <p class="text-xs text-plum-400 mb-3">Tap a guide to see the shapes, colors, and designs, then write your picks in the notes below.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <template x-for="g in guides" :key="g.src">
+                            <button type="button" @click="openGuide(g.src, g.title)" class="flex flex-col items-center gap-1 w-20 group">
+                                <img :src="g.src" :alt="g.title" loading="lazy"
+                                     class="w-16 h-16 rounded-xl object-cover border-2 border-rose-200 group-hover:border-gold-400 transition-colors">
+                                <span class="text-[11px] text-plum-400 text-center" x-text="g.title"></span>
+                            </button>
                         </template>
                     </div>
-                </fieldset>
-
-                <!-- Nail shape / color -->
-                <fieldset class="grid sm:grid-cols-2 gap-4">
-                    <div class="sm:col-span-2">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm">Nail shape</label>
-                            <button type="button" @click="openGuide('images/nail-shapes-guide.jpg', 'Shape Guide')" class="text-xs text-rose-500 hover:text-rose-600 underline">See shape guide</button>
-                        </div>
-                        <div class="flex flex-wrap gap-3">
-                            <template x-for="shape in pricing.nail_shapes" :key="shape">
-                                <label class="flex flex-col items-center gap-1 cursor-pointer group w-16">
-                                    <span class="relative flex items-center justify-center w-16 h-16 rounded-xl border-2 transition-colors"
-                                        :class="form.nailShape === shape ? 'border-gold-400 bg-rose-50/70 text-rose-600 shadow-glam' : 'border-rose-200 text-rose-300 group-hover:border-rose-300'">
-                                        <input type="radio" name="nail_shape" :value="shape" x-model="form.nailShape" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                        <span x-html="shapeIcon(shape)"></span>
-                                    </span>
-                                    <span class="text-[11px] text-plum-400 text-center" x-text="shape"></span>
-                                </label>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm">Nail color</label>
-                            <button type="button" @click="openGuide('images/color-guide.jpg', 'Color Guide')" class="text-xs text-rose-500 hover:text-rose-600 underline">See color guide</button>
-                        </div>
-
-                        <template x-for="group in pricing.nail_color_groups" :key="group.category">
-                            <div class="mb-4">
-                                <p class="text-[11px] uppercase tracking-[0.15em] text-gold-600 mb-2" x-text="group.category"></p>
-                                <div class="flex flex-wrap gap-3">
-                                    <template x-for="[hex, label] in Object.entries(group.colors)" :key="hex">
-                                        <label class="flex flex-col items-center gap-1 cursor-pointer group">
-                                            <span class="relative w-9 h-9">
-                                                <input type="radio" name="nail_color" :value="label" x-model="form.nailColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                                <span :style="'background-color:' + hex"
-                                                    class="pointer-events-none absolute inset-0 rounded-full border-2 transition-all"
-                                                    :class="form.nailColor === label ? 'border-gold-500 ring-2 ring-gold-300 shadow-glam' : 'border-gray-200 group-hover:border-gold-300'"></span>
-                                            </span>
-                                            <span class="text-[11px] text-plum-400 text-center w-14" x-text="label"></span>
-                                        </label>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-
-                        <label class="flex items-center gap-2 border rounded-xl px-4 py-2 cursor-pointer transition-colors max-w-xs"
-                               :class="form.nailColor === 'Other / Custom (specify in notes)' ? 'border-gold-400 bg-rose-50/70' : 'border-gray-200'">
-                            <input type="radio" name="nail_color" value="Other / Custom (specify in notes)" x-model="form.nailColor" class="text-rose-500 focus:ring-rose-400">
-                            <span class="text-sm">Other / Custom (specify in notes)</span>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- Full set design -->
-                <fieldset>
-                    <legend class="font-serif text-lg text-plum-700 mb-2">Full Set Design (optional)</legend>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-2 border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                               :class="!form.fullSetDesignType ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
-                            <input type="radio" name="full_set_design_type" value="" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
-                            <span class="text-sm">No design (plain color only)</span>
-                        </label>
-                        <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
-                            <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                                   :class="form.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
-                                <span class="flex items-center gap-3">
-                                    <input type="radio" name="full_set_design_type" :value="key" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
-                                    <template x-if="key === 'french'">
-                                        <img src="images/french-example.jpg" alt="French example" class="w-10 h-10 rounded-lg object-cover cursor-zoom-in" @click.stop.prevent="openGuide('images/french-example.jpg', 'French')">
-                                    </template>
-                                    <template x-if="key === 'ombre'">
-                                        <img src="images/ombre-example.jpg" alt="Ombre example" class="w-10 h-10 rounded-lg object-cover cursor-zoom-in" @click.stop.prevent="openGuide('images/ombre-example.jpg', 'Ombre')">
-                                    </template>
-                                    <template x-if="key === 'cateye'">
-                                        <img src="images/cateye-example.jpg" alt="Cat eye example" class="w-10 h-10 rounded-lg object-cover cursor-zoom-in" @click.stop.prevent="openGuide('images/cateye-example.jpg', 'Cat eye')">
-                                    </template>
-                                    <span x-text="item.label"></span>
-                                </span>
-                                <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
-                            </label>
-                        </template>
-                    </div>
-                </fieldset>
-
-                <!-- Per-nail add-ons -->
-                <fieldset>
-                    <legend class="font-serif text-lg text-plum-700 mb-2">Per-nail add-ons</legend>
-                    <div class="space-y-2">
-                        <template x-for="[key, item] in Object.entries(pricing.addons)" :key="key">
-                            <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2">
-                                <div>
-                                    <p x-text="item.label" class="text-sm"></p>
-                                    <p class="text-xs text-plum-400">₱<span x-text="item.price"></span> per nail</p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" @click="form.addons[key] = Math.max(0, (form.addons[key]||0) - 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">−</button>
-                                    <input type="number" x-model.number="form.addons[key]" min="0" max="10"
-                                        class="w-12 text-center rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
-                                    <button type="button" @click="form.addons[key] = Math.min(10, (form.addons[key]||0) + 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">+</button>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </fieldset>
-
-                <!-- Removal -->
-                <fieldset>
-                    <legend class="font-serif text-lg text-plum-700 mb-2">Removal (if applicable)</legend>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="removal_option" value="" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
-                            No removal needed
-                        </label>
-                        <template x-for="[key, item] in Object.entries(pricing.removal)" :key="key">
-                            <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                                   :class="form.removalOption === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
-                                <span class="flex items-center gap-3">
-                                    <input type="radio" name="removal_option" :value="key" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
-                                    <span x-text="item.label"></span>
-                                </span>
-                                <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
-                            </label>
-                        </template>
-                    </div>
-                </fieldset>
+                </div>
 
                 <div>
                     <label class="block text-sm mb-1">Notes (design inspo, custom color, allergies, etc.)</label>
@@ -603,48 +474,6 @@
                 </button>
             </form>
 
-            <!-- ============ LIVE PRICE SUMMARY ============ -->
-            <aside class="md:col-span-1">
-                <div class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sticky top-6 space-y-3">
-                    <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Your glam</p>
-                    <h2 class="font-serif text-xl font-semibold text-rose-600 mb-2">Estimated total</h2>
-
-                    <div class="flex justify-between text-sm" x-show="form.baseService">
-                        <span x-text="form.baseService ? pricing.base_services[form.baseService].label : ''"></span>
-                        <span x-text="'₱' + (form.baseService ? pricing.base_services[form.baseService].price : 0)"></span>
-                    </div>
-
-                    <div class="flex justify-between text-sm" x-show="form.fullSetDesignType">
-                        <span x-text="form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].label : ''"></span>
-                        <span x-text="'₱' + (form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].price : 0)"></span>
-                    </div>
-
-                    <template x-for="[key, qty] in Object.entries(form.addons)" :key="key">
-                        <div class="flex justify-between text-sm" x-show="qty > 0">
-                            <span x-text="pricing.addons[key]?.label + ' × ' + qty"></span>
-                            <span x-text="'₱' + (pricing.addons[key]?.price * qty)"></span>
-                        </div>
-                    </template>
-
-                    <div class="flex justify-between text-sm" x-show="form.removalOption">
-                        <span x-text="form.removalOption ? pricing.removal[form.removalOption].label : ''"></span>
-                        <span x-text="'₱' + (form.removalOption ? pricing.removal[form.removalOption].price : 0)"></span>
-                    </div>
-
-                    <div class="flex justify-between text-sm text-plum-400 italic" x-show="form.serviceLocation === 'home_service'">
-                        <span>Home service fee</span>
-                        <span>TBD</span>
-                    </div>
-
-                    <hr class="border-gold-200">
-                    <div class="flex justify-between font-serif font-semibold text-xl text-rose-600">
-                        <span>Total</span>
-                        <span x-text="'₱' + total"></span>
-                    </div>
-                    <p class="text-xs text-plum-400" x-show="form.serviceLocation === 'home_service'">Home service fee not yet included — Jen will confirm it based on your address.</p>
-                    <p class="text-xs text-plum-400" x-show="form.serviceLocation !== 'home_service'">Final price confirmed by Jen once the design is finalized in person.</p>
-                </div>
-            </aside>
         </div>
 
         <!-- ============ REFERENCE GUIDE MODAL (shape/color/design examples) ============ -->
@@ -668,13 +497,6 @@
 
             <div class="text-left space-y-2 text-sm bg-rose-50 rounded-xl p-4">
                 <div class="flex justify-between"><span class="text-gray-500">Name</span><span x-text="form.customerName"></span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Base service</span><span x-text="pricing.base_services[form.baseService]?.label"></span></div>
-                <template x-if="form.fullSetDesignType">
-                    <div class="flex justify-between"><span class="text-gray-500">Design</span><span x-text="pricing.full_set_designs[form.fullSetDesignType]?.label"></span></div>
-                </template>
-                <template x-if="form.nailColor">
-                    <div class="flex justify-between"><span class="text-gray-500">Color</span><span x-text="form.nailColor"></span></div>
-                </template>
                 <template x-if="form.serviceLocation">
                     <div class="flex justify-between"><span class="text-gray-500">Location</span><span x-text="form.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base'"></span></div>
                 </template>
@@ -687,15 +509,13 @@
                 <template x-if="form.preferredTime">
                     <div class="flex justify-between"><span class="text-gray-500">Preferred time</span><span x-text="form.preferredTime"></span></div>
                 </template>
-                <hr class="border-rose-200">
-                <div class="flex justify-between font-bold text-rose-600"><span>Estimated total</span><span x-text="'₱' + total"></span></div>
             </div>
 
-            <p class="text-xs text-gray-400 mt-4" x-show="form.serviceLocation === 'home_service'">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
+            <p class="text-xs text-gray-400 mt-4">Jen will send your total price on Messenger after she sees your design<span x-show="form.serviceLocation === 'home_service'"> (a home service fee applies based on your address)</span>.</p>
 
             <div class="mt-6 space-y-3">
                 <button type="button" @click="downloadReceipt" class="block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    <span x-text="downloading ? 'Preparing image…' : '1. Show booking receipt'"></span>
+                    <span x-text="downloading ? 'Preparing image…' : '1. Download booking receipt'"></span>
                 </button>
                 <a :href="messengerLink" target="_blank"
                    class="block w-full border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 hover:bg-rose-50 transition-all">
@@ -708,7 +528,7 @@
                 <button type="button" @click="copySummary" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">
                     <span x-text="copied ? 'Copied!' : 'Prefer text instead? Copy booking details'"></span>
                 </button>
-                <p class="text-xs text-plum-400">Step 1 shows your receipt as a picture. Step 2 opens Messenger (or WhatsApp) — attach that picture there.</p>
+                <p class="text-xs text-plum-400">Step 1 makes your receipt as a picture you can download. Step 2 opens Messenger (or WhatsApp) — attach that picture there.</p>
             </div>
             <canvas x-ref="receiptCanvas" width="800" height="1000" class="hidden"></canvas>
 
@@ -725,14 +545,15 @@
                     <img :src="receiptImageUrl" alt="Booking receipt" class="w-full rounded-xl border border-gold-200/60 shadow-sm">
 
                     <div class="bg-rose-50 rounded-xl p-3 text-xs text-plum-600 space-y-1">
+                        <p class="font-medium">If the download doesn't start:</p>
                         <p><strong>On your phone:</strong> press and hold the picture above, then tap "Save Image" or "Download image."</p>
                         <p><strong>On a computer:</strong> right-click the picture and choose "Save image as…"</p>
                     </div>
 
-                    <a :href="receiptImageUrl" :download="receiptFileName"
-                       class="glam-button block w-full text-center bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all">
-                        Try direct download
-                    </a>
+                    <button type="button" @click="downloadImage(receiptImageUrl, receiptFileName)"
+                            class="glam-button block w-full text-center bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all">
+                        Download receipt
+                    </button>
                     <a :href="messengerLink" target="_blank"
                        class="block w-full text-center border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3 hover:bg-rose-50 transition-all">
                         Open Messenger
@@ -806,31 +627,19 @@
 
             <div class="bg-rose-50 border border-gold-200/60 rounded-2xl px-5 py-4">
                 <p class="text-sm text-rose-600 font-medium" x-text="$store.site.lang === 'en' ? '💕 Refer a friend, get ₱20 off!' : '💕 Mag-refer ng kaibigan, ₱20 discount!'"></p>
-                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱50 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱50 off sa susunod mong set.'"></p>
+                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱20 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱50 off sa susunod mong set.'"></p>
             </div>
         </section>
 
-        <!-- ============ PRICE CALCULATOR (private, password-gated) ============ -->
+        <!-- ============ PRICE CALCULATOR (Jen's tool) ============ -->
         <section id="calculator" class="mt-16 scroll-mt-24">
             <div class="text-center mb-6">
-                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">🔒 Private</p>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Jen's tool</p>
                 <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Price Calculator</h2>
             </div>
 
-            <!-- Locked view -->
-            <div x-show="!calculatorUnlocked" class="max-w-xs mx-auto bg-white/90 rounded-2xl shadow-glam border border-gold-200/60 p-6 text-center space-y-3">
-                <p class="text-sm text-plum-400">This tool is just for Jen. Enter the password to continue.</p>
-                <input type="password" x-model="calculatorPasswordInput" @keyup.enter="unlockCalculator"
-                       placeholder="Password"
-                       class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400 text-center">
-                <p x-show="calculatorError" x-cloak class="text-xs text-rose-500">Incorrect password, try again.</p>
-                <button type="button" @click="unlockCalculator" class="w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-2.5 shadow-glam transition-all">
-                    Unlock
-                </button>
-            </div>
-
-            <!-- Unlocked calculator -->
-            <div x-show="calculatorUnlocked" x-cloak class="grid md:grid-cols-3 gap-8">
+            <!-- Calculator -->
+            <div class="grid md:grid-cols-3 gap-8">
                 <div class="md:col-span-2 bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-8">
 
                     <fieldset>
@@ -838,9 +647,9 @@
                         <div class="space-y-2">
                             <template x-for="[key, item] in Object.entries(pricing.base_services)" :key="key">
                                 <label class="flex items-center justify-between border rounded-xl px-4 py-3 cursor-pointer transition-colors"
-                                       :class="form.baseService === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                       :class="calc.baseService === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
                                     <span class="flex items-center gap-3">
-                                        <input type="radio" name="calc_base_service" :value="key" x-model="form.baseService" class="text-rose-500 focus:ring-rose-400">
+                                        <input type="radio" name="calc_base_service" :value="key" x-model="calc.baseService" class="text-rose-500 focus:ring-rose-400">
                                         <span x-text="item.label"></span>
                                     </span>
                                     <span class="text-sm text-plum-400">₱<span x-text="item.price"></span></span>
@@ -853,15 +662,15 @@
                         <legend class="font-serif text-lg text-plum-700 mb-2">Full Set Design (optional)</legend>
                         <div class="space-y-2">
                             <label class="flex items-center gap-2 border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                                   :class="!form.fullSetDesignType ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
-                                <input type="radio" name="calc_full_set_design_type" value="" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                                   :class="!calc.fullSetDesignType ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                <input type="radio" name="calc_full_set_design_type" value="" x-model="calc.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
                                 <span class="text-sm">No design (plain color only)</span>
                             </label>
                             <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
                                 <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                                       :class="form.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                       :class="calc.fullSetDesignType === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
                                     <span class="flex items-center gap-3">
-                                        <input type="radio" name="calc_full_set_design_type" :value="key" x-model="form.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
+                                        <input type="radio" name="calc_full_set_design_type" :value="key" x-model="calc.fullSetDesignType" class="text-rose-500 focus:ring-rose-400">
                                         <span x-text="item.label"></span>
                                     </span>
                                     <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
@@ -880,10 +689,10 @@
                                         <p class="text-xs text-plum-400">₱<span x-text="item.price"></span> per nail</p>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="form.addons[key] = Math.max(0, (form.addons[key]||0) - 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">−</button>
-                                        <input type="number" x-model.number="form.addons[key]" min="0" max="10"
+                                        <button type="button" @click="calc.addons[key] = Math.max(0, (calc.addons[key]||0) - 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">−</button>
+                                        <input type="number" x-model.number="calc.addons[key]" min="0" max="10"
                                             class="w-12 text-center rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
-                                        <button type="button" @click="form.addons[key] = Math.min(10, (form.addons[key]||0) + 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">+</button>
+                                        <button type="button" @click="calc.addons[key] = Math.min(10, (calc.addons[key]||0) + 1)" class="w-7 h-7 rounded-full bg-rose-100 text-rose-600">+</button>
                                     </div>
                                 </div>
                             </template>
@@ -894,14 +703,14 @@
                         <legend class="font-serif text-lg text-plum-700 mb-2">Removal (if applicable)</legend>
                         <div class="space-y-2">
                             <label class="flex items-center gap-2">
-                                <input type="radio" name="calc_removal_option" value="" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                                <input type="radio" name="calc_removal_option" value="" x-model="calc.removalOption" class="text-rose-500 focus:ring-rose-400">
                                 No removal needed
                             </label>
                             <template x-for="[key, item] in Object.entries(pricing.removal)" :key="key">
                                 <label class="flex items-center justify-between border rounded-xl px-4 py-2 cursor-pointer transition-colors"
-                                       :class="form.removalOption === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
+                                       :class="calc.removalOption === key ? 'border-gold-400 bg-rose-50/70 shadow-sm' : 'border-gray-200'">
                                     <span class="flex items-center gap-3">
-                                        <input type="radio" name="calc_removal_option" :value="key" x-model="form.removalOption" class="text-rose-500 focus:ring-rose-400">
+                                        <input type="radio" name="calc_removal_option" :value="key" x-model="calc.removalOption" class="text-rose-500 focus:ring-rose-400">
                                         <span x-text="item.label"></span>
                                     </span>
                                     <span class="text-sm text-plum-400">+ ₱<span x-text="item.price"></span></span>
@@ -911,12 +720,55 @@
                     </fieldset>
 
                     <fieldset>
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Nail color (optional)</legend>
+                        <div class="flex flex-wrap gap-3">
+                            <template x-for="[hex, label] in commonColors" :key="hex">
+                                <button type="button" @click="calc.nailColor = calc.nailColor === label ? '' : label"
+                                        :aria-pressed="calc.nailColor === label" :aria-label="label"
+                                        class="flex flex-col items-center gap-1 w-16 group">
+                                    <span :style="'background-color:' + hex"
+                                          class="w-9 h-9 rounded-full border-2 transition-all"
+                                          :class="calc.nailColor === label ? 'border-gold-500 ring-2 ring-gold-300 shadow-glam' : 'border-gray-200 group-hover:border-gold-300'"></span>
+                                    <span class="text-[11px] text-plum-400 text-center leading-tight" x-text="label"></span>
+                                </button>
+                            </template>
+                        </div>
+                        <button type="button" @click="calc.nailColor = calc.nailColor === 'Other / Custom' ? '' : 'Other / Custom'"
+                                class="mt-3 border rounded-xl px-4 py-2 text-sm transition-colors"
+                                :class="calc.nailColor === 'Other / Custom' ? 'border-gold-400 bg-rose-50/70' : 'border-gray-200'">Other / Custom</button>
+                    </fieldset>
+
+                    <fieldset>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" :checked="form.serviceLocation === 'home_service'"
-                                   @change="form.serviceLocation = $event.target.checked ? 'home_service' : ''"
+                            <input type="checkbox" x-model="calc.homeService"
                                    class="text-rose-500 focus:ring-rose-400 rounded">
-                            <span class="text-sm">Home Service (travel fee applies, TBD)</span>
+                            <span class="text-sm">Home Service (travel fee applies)</span>
                         </label>
+                        <div x-show="calc.homeService" x-cloak class="mt-3 flex items-center gap-2">
+                            <label class="text-sm">Travel fee</label>
+                            <span class="text-sm text-plum-400">₱</span>
+                            <input type="number" min="0" x-model.number="calc.homeServiceFee" placeholder="0"
+                                   class="w-28 text-center rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="space-y-3">
+                        <legend class="font-serif text-lg text-plum-700 mb-2">Receipt</legend>
+                        <div>
+                            <label class="block text-sm mb-1">Client name (optional)</label>
+                            <input type="text" x-model="calc.clientName"
+                                   class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Client's inspo photo (optional)</label>
+                            <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
+                                <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                                </svg>
+                                <span class="text-sm text-plum-500" x-text="calc.inspoFileName || 'Tap to attach the client\'s inspo photo'"></span>
+                                <input type="file" accept="image/*" class="hidden" @change="handleInspoFile($event)">
+                            </label>
+                        </div>
                     </fieldset>
                 </div>
 
@@ -925,37 +777,64 @@
                         <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Quote total</p>
                         <h3 class="font-serif text-xl font-semibold text-rose-600 mb-2">Estimated total</h3>
 
-                        <div class="flex justify-between text-sm" x-show="form.baseService">
-                            <span x-text="form.baseService ? pricing.base_services[form.baseService].label : ''"></span>
-                            <span x-text="'₱' + (form.baseService ? pricing.base_services[form.baseService].price : 0)"></span>
+                        <div class="flex justify-between text-sm" x-show="calc.baseService">
+                            <span x-text="calc.baseService ? pricing.base_services[calc.baseService].label : ''"></span>
+                            <span x-text="'₱' + (calc.baseService ? pricing.base_services[calc.baseService].price : 0)"></span>
                         </div>
-                        <div class="flex justify-between text-sm" x-show="form.fullSetDesignType">
-                            <span x-text="form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].label : ''"></span>
-                            <span x-text="'₱' + (form.fullSetDesignType ? pricing.full_set_designs[form.fullSetDesignType].price : 0)"></span>
+                        <div class="flex justify-between text-sm" x-show="calc.fullSetDesignType">
+                            <span x-text="calc.fullSetDesignType ? pricing.full_set_designs[calc.fullSetDesignType].label : ''"></span>
+                            <span x-text="'₱' + (calc.fullSetDesignType ? pricing.full_set_designs[calc.fullSetDesignType].price : 0)"></span>
                         </div>
-                        <template x-for="[key, qty] in Object.entries(form.addons)" :key="key">
+                        <template x-for="[key, qty] in Object.entries(calc.addons)" :key="key">
                             <div class="flex justify-between text-sm" x-show="qty > 0">
                                 <span x-text="pricing.addons[key]?.label + ' × ' + qty"></span>
                                 <span x-text="'₱' + (pricing.addons[key]?.price * qty)"></span>
                             </div>
                         </template>
-                        <div class="flex justify-between text-sm" x-show="form.removalOption">
-                            <span x-text="form.removalOption ? pricing.removal[form.removalOption].label : ''"></span>
-                            <span x-text="'₱' + (form.removalOption ? pricing.removal[form.removalOption].price : 0)"></span>
+                        <div class="flex justify-between text-sm" x-show="calc.removalOption">
+                            <span x-text="calc.removalOption ? pricing.removal[calc.removalOption].label : ''"></span>
+                            <span x-text="'₱' + (calc.removalOption ? pricing.removal[calc.removalOption].price : 0)"></span>
                         </div>
-                        <div class="flex justify-between text-sm text-plum-400 italic" x-show="form.serviceLocation === 'home_service'">
+                        <div class="flex justify-between text-sm" x-show="calc.homeService">
                             <span>Home service fee</span>
-                            <span>TBD</span>
+                            <span x-text="'₱' + calcHomeFee"></span>
                         </div>
 
                         <hr class="border-gold-200">
                         <div class="flex justify-between font-serif font-semibold text-xl text-rose-600">
                             <span>Total</span>
-                            <span x-text="'₱' + total"></span>
+                            <span x-text="'₱' + calcTotal"></span>
                         </div>
-                        <button type="button" @click="calculatorUnlocked = false" class="w-full text-center text-xs text-plum-400 hover:text-rose-500 underline mt-2">Lock again</button>
+                        <button type="button" @click="downloadQuoteReceipt" :disabled="!calcLineItems.length"
+                                class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2">
+                            <span x-text="calcDownloading ? 'Preparing image…' : 'Download receipt'"></span>
+                        </button>
                     </div>
                 </aside>
+            </div>
+
+            <canvas x-ref="calcReceiptCanvas" width="760" height="1000" class="hidden"></canvas>
+
+            <!-- Calculator receipt modal -->
+            <div x-show="showCalcReceiptModal" x-cloak
+                 class="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4"
+                 @click.self="showCalcReceiptModal = false">
+                <div class="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[92vh] overflow-y-auto p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <p class="font-serif font-semibold text-rose-600">Receipt</p>
+                        <button type="button" @click="showCalcReceiptModal = false" class="text-plum-400 hover:text-rose-500 text-xl leading-none px-2">&times;</button>
+                    </div>
+                    <img :src="calcReceiptImageUrl" alt="Receipt" class="w-full rounded-xl border border-gold-200/60 shadow-sm">
+                    <div class="bg-rose-50 rounded-xl p-3 text-xs text-plum-600 space-y-1">
+                        <p class="font-medium">If the download doesn't start:</p>
+                        <p><strong>On your phone:</strong> press and hold the picture above, then tap "Save Image" or "Download image."</p>
+                        <p><strong>On a computer:</strong> right-click the picture and choose "Save image as…"</p>
+                    </div>
+                    <button type="button" @click="downloadImage(calcReceiptImageUrl, calcReceiptFileName)"
+                            class="glam-button block w-full text-center bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all">
+                        Download receipt
+                    </button>
+                </div>
             </div>
         </section>
     </main>
@@ -1092,11 +971,20 @@
                 receiptImageUrl: null,
                 receiptFileName: 'booking-receipt.png',
                 guideModal: { open: false, src: '', title: '' },
-                calculatorUnlocked: false,
+                commonColors: Object.entries(pricing.nail_color_groups.find(g => g.category === 'Signature Shades').colors),
+                guides: [
+                    { src: 'images/nail-shapes-guide.jpg', title: 'Shape guide' },
+                    { src: 'images/color-guide.jpg', title: 'Color guide' },
+                    { src: 'images/french-example.jpg', title: 'French' },
+                    { src: 'images/ombre-example.jpg', title: 'Ombre' },
+                    { src: 'images/cateye-example.jpg', title: 'Cat eye' },
+                ],
+                calcDownloading: false,
+                showCalcReceiptModal: false,
+                calcReceiptImageUrl: null,
+                calcReceiptFileName: 'receipt.png',
                 showInstallGuide: false,
                 isIOSDevice: /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream,
-                calculatorPasswordInput: '',
-                calculatorError: false,
                 fileName: '',
                 referenceImageDataUrl: null,
                 lightboxIndex: null,
@@ -1118,13 +1006,21 @@
                     preferredTime: '',
                     serviceLocation: '',
                     serviceAddress: '',
+                    notes: '',
+                },
+
+                // Jen's private price calculator (separate from the client booking form)
+                calc: {
                     baseService: '',
-                    nailShape: '',
-                    nailColor: '',
                     fullSetDesignType: '',
                     addons: {},
                     removalOption: '',
-                    notes: '',
+                    nailColor: '',
+                    homeService: false,
+                    homeServiceFee: '',
+                    clientName: '',
+                    inspoFileName: '',
+                    inspoDataUrl: null,
                 },
 
                 shapeIcon(shape) {
@@ -1134,16 +1030,6 @@
 
                 openGuide(src, title) {
                     this.guideModal = { open: true, src, title };
-                },
-
-                unlockCalculator() {
-                    if (this.calculatorPasswordInput === 'jen12345') {
-                        this.calculatorUnlocked = true;
-                        this.calculatorError = false;
-                        this.calculatorPasswordInput = '';
-                    } else {
-                        this.calculatorError = true;
-                    }
                 },
 
                 installApp() {
@@ -1179,23 +1065,65 @@
                     return day === 0 || day === 6;
                 },
 
-                get total() {
+                get calcTotal() {
                     let sum = 0;
-                    if (this.form.baseService && pricing.base_services[this.form.baseService]) {
-                        sum += pricing.base_services[this.form.baseService].price;
+                    if (this.calc.baseService && pricing.base_services[this.calc.baseService]) {
+                        sum += pricing.base_services[this.calc.baseService].price;
                     }
-                    if (this.form.fullSetDesignType && pricing.full_set_designs[this.form.fullSetDesignType]) {
-                        sum += pricing.full_set_designs[this.form.fullSetDesignType].price;
+                    if (this.calc.fullSetDesignType && pricing.full_set_designs[this.calc.fullSetDesignType]) {
+                        sum += pricing.full_set_designs[this.calc.fullSetDesignType].price;
                     }
-                    for (const [key, qty] of Object.entries(this.form.addons)) {
+                    for (const [key, qty] of Object.entries(this.calc.addons)) {
                         if (qty > 0 && pricing.addons[key]) {
                             sum += pricing.addons[key].price * qty;
                         }
                     }
-                    if (this.form.removalOption && pricing.removal[this.form.removalOption]) {
-                        sum += pricing.removal[this.form.removalOption].price;
+                    if (this.calc.removalOption && pricing.removal[this.calc.removalOption]) {
+                        sum += pricing.removal[this.calc.removalOption].price;
                     }
-                    return sum;
+                    return sum + this.calcHomeFee;
+                },
+
+                get calcHomeFee() {
+                    return this.calc.homeService ? (Number(this.calc.homeServiceFee) || 0) : 0;
+                },
+
+                // [label, amount] rows for Jen's receipt
+                get calcLineItems() {
+                    const c = this.calc;
+                    const items = [];
+                    if (c.baseService && pricing.base_services[c.baseService]) {
+                        const b = pricing.base_services[c.baseService];
+                        items.push([b.label, b.price]);
+                    }
+                    if (c.fullSetDesignType && pricing.full_set_designs[c.fullSetDesignType]) {
+                        const d = pricing.full_set_designs[c.fullSetDesignType];
+                        items.push([d.label, d.price]);
+                    }
+                    for (const [key, qty] of Object.entries(c.addons)) {
+                        if (qty > 0 && pricing.addons[key]) {
+                            items.push([`${pricing.addons[key].label} × ${qty}`, pricing.addons[key].price * qty]);
+                        }
+                    }
+                    if (c.removalOption && pricing.removal[c.removalOption]) {
+                        const r = pricing.removal[c.removalOption];
+                        items.push([r.label, r.price]);
+                    }
+                    if (c.homeService) items.push(['Home service fee', this.calcHomeFee]);
+                    return items;
+                },
+
+                handleInspoFile(event) {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        this.calc.inspoFileName = '';
+                        this.calc.inspoDataUrl = null;
+                        return;
+                    }
+                    this.calc.inspoFileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => { this.calc.inspoDataUrl = e.target.result; };
+                    reader.readAsDataURL(file);
                 },
 
                 get summaryText() {
@@ -1210,17 +1138,8 @@
                     if (f.preferredTime) lines.push(`Preferred time: ${f.preferredTime}`);
                     lines.push(`Location: ${f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base'}`);
                     if (f.serviceAddress) lines.push(`Address: ${f.serviceAddress}`);
-                    lines.push(`Base service: ${pricing.base_services[f.baseService]?.label || ''}`);
-                    if (f.nailShape) lines.push(`Nail shape: ${f.nailShape}`);
-                    if (f.nailColor) lines.push(`Nail color: ${f.nailColor}`);
-                    if (f.fullSetDesignType) lines.push(`Full set design: ${pricing.full_set_designs[f.fullSetDesignType]?.label}`);
-                    const addonLines = Object.entries(f.addons)
-                        .filter(([, qty]) => qty > 0)
-                        .map(([key, qty]) => `  - ${pricing.addons[key]?.label} × ${qty}`);
-                    if (addonLines.length) lines.push('Add-ons:', ...addonLines);
-                    if (f.removalOption) lines.push(`Removal: ${pricing.removal[f.removalOption]?.label}`);
                     if (f.notes) lines.push(`Notes: ${f.notes}`);
-                    lines.push(`Estimated total: ₱${this.total}${f.serviceLocation === 'home_service' ? ' (+ home service fee, TBD)' : ''}`);
+                    if (this.referenceImageDataUrl) lines.push('Reference photo: attached on my booking receipt');
                     return lines.join('\n');
                 },
 
@@ -1256,14 +1175,6 @@
                     if (f.preferredTime) rows.push(['Preferred time', f.preferredTime]);
                     rows.push(['Location', f.serviceLocation === 'home_service' ? 'Home Service' : 'Home Base']);
                     if (f.serviceAddress) rows.push(['Address', f.serviceAddress]);
-                    rows.push(['Base service', pricing.base_services[f.baseService]?.label || '']);
-                    if (f.nailShape) rows.push(['Nail shape', f.nailShape]);
-                    if (f.nailColor) rows.push(['Nail color', f.nailColor]);
-                    if (f.fullSetDesignType) rows.push(['Full set design', pricing.full_set_designs[f.fullSetDesignType]?.label]);
-                    Object.entries(f.addons).filter(([, qty]) => qty > 0).forEach(([key, qty]) => {
-                        rows.push([pricing.addons[key]?.label, `× ${qty}`]);
-                    });
-                    if (f.removalOption) rows.push(['Removal', pricing.removal[f.removalOption]?.label]);
                     if (f.notes) rows.push(['Notes', f.notes]);
                     return rows;
                 },
@@ -1344,7 +1255,7 @@
                         measuredHeight += Math.max(lines.length, 1) * rowLineHeight + rowGap;
                     });
                     if (refImg) measuredHeight += imageDisplayHeight + 70;
-                    measuredHeight += 150; // total block + footer
+                    measuredHeight += 106; // price note + footer
 
                     canvas.width = width;
                     canvas.height = measuredHeight;
@@ -1463,32 +1374,17 @@
                     this.drawDivider(ctx, x, rightEdge, y, true);
                     y += 12;
 
-                    // Total block with tinted background
-                    const totalBoxH = this.form.serviceLocation === 'home_service' ? 92 : 70;
-                    ctx.fillStyle = '#fdf2f4';
-                    this.roundRect(ctx, x, y, contentWidth, totalBoxH, 16);
-                    ctx.fill();
-
-                    y += 42;
-                    ctx.fillStyle = '#c22e51';
-                    ctx.font = '600 24px "Bookman Old Style", Georgia, serif';
-                    ctx.fillText('Estimated total', x + 20, y);
-                    ctx.textAlign = 'right';
-                    ctx.font = '700 26px "Bookman Old Style", Georgia, serif';
-                    ctx.fillText('₱' + this.total, rightEdge - 20, y);
+                    // Note: Jen sends the total price after she sees the design
+                    y += 34;
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#8a4d68';
+                    ctx.font = 'italic 13px "Bookman Old Style", Georgia, serif';
+                    ctx.fillText(this.form.serviceLocation === 'home_service'
+                        ? 'Total price and home service fee to be confirmed by Jen.'
+                        : 'Total price to be confirmed by Jen once she sees your design.', width / 2, y);
                     ctx.textAlign = 'left';
 
-                    if (this.form.serviceLocation === 'home_service') {
-                        y += 24;
-                        ctx.fillStyle = '#8a4d68';
-                        ctx.font = 'italic 12px "Bookman Old Style", Georgia, serif';
-                        ctx.fillText('+ home service fee, to be confirmed by Jen', x + 20, y);
-                        y += 28;
-                    } else {
-                        y += 30;
-                    }
-
-                    y += 26;
+                    y += 32;
                     ctx.textAlign = 'center';
                     ctx.fillStyle = '#8a4d68';
                     ctx.font = '12px "Bookman Old Style", Georgia, serif';
@@ -1514,6 +1410,222 @@
                         ctx.textAlign = 'center';
                         ctx.fillText('✦', midX, y + 4);
                         ctx.textAlign = 'left';
+                    }
+                },
+
+                async drawQuoteReceipt() {
+                    const canvas = this.$refs.calcReceiptCanvas;
+                    const ctx = canvas.getContext('2d');
+
+                    if (document.fonts && document.fonts.ready) {
+                        try {
+                            await document.fonts.load('600 44px "Alex Brush"');
+                            await document.fonts.ready;
+                        } catch (e) { /* fonts best-effort */ }
+                    }
+
+                    let img = null;
+                    if (this.calc.inspoDataUrl) {
+                        try { img = await this.loadImage(this.calc.inspoDataUrl); } catch (e) { img = null; }
+                    }
+
+                    const FONT = '"Bookman Old Style", Georgia, serif';
+                    const width = 760, outerPad = 40, cardPad = 48;
+                    const lineH = 25, rowGap = 14, labelColWidth = 190, priceColWidth = 130;
+                    const contentWidth = width - outerPad * 2 - cardPad * 2;
+                    const metaValueMax = contentWidth - labelColWidth;
+                    const itemLabelMax = contentWidth - priceColWidth;
+
+                    const meta = [];
+                    if (this.calc.clientName) meta.push(['Client', this.calc.clientName]);
+                    if (this.calc.nailColor) meta.push(['Nail color', this.calc.nailColor]);
+                    meta.push(['Date', new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })]);
+                    const items = this.calcLineItems;
+
+                    // Photo is shown whole (fit inside the box), never cropped
+                    let imgW = 0, imgH = 0;
+                    if (img) {
+                        const fit = Math.min(contentWidth / img.width, 420 / img.height, 1.4);
+                        imgW = Math.round(img.width * fit);
+                        imgH = Math.round(img.height * fit);
+                    }
+
+                    // ---- measure ----
+                    ctx.font = '600 16px ' + FONT;
+                    let metaH = 0;
+                    meta.forEach(([, v]) => { metaH += Math.max(this.wrapText(ctx, v, metaValueMax).length, 1) * lineH + rowGap; });
+                    ctx.font = '15px ' + FONT;
+                    let itemsH = 0;
+                    items.forEach(([l]) => { itemsH += Math.max(this.wrapText(ctx, l, itemLabelMax).length, 1) * lineH + rowGap; });
+
+                    const firstRowY = 198;                       // matches the booking receipt header
+                    const boxTop = firstRowY + metaH + 22 + itemsH;
+                    const footerY = boxTop + 98 + (img ? 62 + imgH : 0);
+                    const height = footerY + 92;
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // ---- background + card ----
+                    ctx.fillStyle = '#fdf2f4';
+                    ctx.fillRect(0, 0, width, height);
+                    const grad = ctx.createRadialGradient(width * 0.05, 0, 0, width * 0.05, 0, 460);
+                    grad.addColorStop(0, 'rgba(212,171,77,0.16)');
+                    grad.addColorStop(1, 'rgba(212,171,77,0)');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, width, height);
+                    const grad2 = ctx.createRadialGradient(width * 0.95, 0, 0, width * 0.95, 0, 420);
+                    grad2.addColorStop(0, 'rgba(223,77,110,0.12)');
+                    grad2.addColorStop(1, 'rgba(223,77,110,0)');
+                    ctx.fillStyle = grad2;
+                    ctx.fillRect(0, 0, width, height);
+
+                    const cardX = outerPad, cardY = outerPad, cardW = width - outerPad * 2, cardH = height - outerPad * 2;
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(194,46,81,0.18)';
+                    ctx.shadowBlur = 28;
+                    ctx.shadowOffsetY = 10;
+                    ctx.fillStyle = '#ffffff';
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.strokeStyle = '#ecd8a2';
+                    ctx.lineWidth = 1.5;
+                    this.roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+                    ctx.stroke();
+
+                    const x = cardX + cardPad;
+                    const rightEdge = cardX + cardW - cardPad;
+                    let y = cardY + 68;
+
+                    // ---- header ----
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '46px "Alex Brush", cursive';
+                    ctx.fillText('Jen Nail Artistry', width / 2, y);
+                    y += 30;
+                    ctx.fillStyle = '#c2953a';
+                    ctx.font = '600 12px ' + FONT;
+                    ctx.save();
+                    ctx.letterSpacing = '3px';
+                    ctx.fillText('RECEIPT', width / 2, y);
+                    ctx.restore();
+                    ctx.textAlign = 'left';
+                    y += 22;
+                    this.drawDivider(ctx, x, rightEdge, y, true);
+                    y += 38;
+
+                    // ---- client / date ----
+                    meta.forEach(([label, value]) => {
+                        ctx.fillStyle = '#a3792d';
+                        ctx.font = '13px ' + FONT;
+                        ctx.fillText(String(label).toUpperCase(), x, y);
+                        ctx.fillStyle = '#391826';
+                        ctx.font = '600 16px ' + FONT;
+                        const lines = this.wrapText(ctx, value, metaValueMax);
+                        lines.forEach((line, i) => ctx.fillText(line, x + labelColWidth, y + i * lineH));
+                        y += Math.max(lines.length, 1) * lineH + rowGap;
+                    });
+
+                    this.drawDivider(ctx, x, rightEdge, y - 12, false);
+                    y += 22;
+
+                    // ---- line items ----
+                    items.forEach(([label, amount]) => {
+                        ctx.fillStyle = '#391826';
+                        ctx.font = '15px ' + FONT;
+                        const lines = this.wrapText(ctx, label, itemLabelMax);
+                        lines.forEach((line, i) => ctx.fillText(line, x, y + i * lineH));
+                        ctx.textAlign = 'right';
+                        ctx.font = '600 16px ' + FONT;
+                        ctx.fillText('₱' + amount, rightEdge, y);
+                        ctx.textAlign = 'left';
+                        y += Math.max(lines.length, 1) * lineH + rowGap;
+                    });
+
+                    // ---- total ----
+                    this.drawDivider(ctx, x, rightEdge, y - 12, true);
+                    ctx.fillStyle = '#fdf2f4';
+                    this.roundRect(ctx, x, y, contentWidth, 64, 16);
+                    ctx.fill();
+                    ctx.fillStyle = '#c22e51';
+                    ctx.font = '600 24px ' + FONT;
+                    ctx.fillText('Total', x + 20, y + 40);
+                    ctx.textAlign = 'right';
+                    ctx.font = '700 26px ' + FONT;
+                    ctx.fillText('₱' + this.calcTotal, rightEdge - 20, y + 40);
+                    ctx.textAlign = 'left';
+                    y += 98;
+
+                    // ---- inspo photo ----
+                    if (img) {
+                        ctx.fillStyle = '#c2953a';
+                        ctx.font = '600 12px ' + FONT;
+                        ctx.save();
+                        ctx.letterSpacing = '2.5px';
+                        ctx.fillText('INSPO', x, y);
+                        ctx.restore();
+                        y += 18;
+                        const ix = x + (contentWidth - imgW) / 2;
+                        ctx.save();
+                        ctx.shadowColor = 'rgba(57,24,38,0.18)';
+                        ctx.shadowBlur = 14;
+                        ctx.shadowOffsetY = 4;
+                        this.roundRect(ctx, ix, y, imgW, imgH, 18);
+                        ctx.fillStyle = '#fff';
+                        ctx.fill();
+                        ctx.restore();
+                        ctx.save();
+                        this.roundRect(ctx, ix, y, imgW, imgH, 18);
+                        ctx.clip();
+                        ctx.drawImage(img, ix, y, imgW, imgH);
+                        ctx.restore();
+                        ctx.strokeStyle = '#ecd8a2';
+                        ctx.lineWidth = 1.5;
+                        this.roundRect(ctx, ix, y, imgW, imgH, 18);
+                        ctx.stroke();
+                        y += imgH + 44;
+                    }
+
+                    // ---- footer ----
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#8a4d68';
+                    ctx.font = '12px ' + FONT;
+                    ctx.fillText('Paliparan 2, Dasmariñas, Cavite  ·  @nailsbyjen.ph', width / 2, y);
+                    ctx.textAlign = 'left';
+
+                    return canvas;
+                },
+
+                async downloadQuoteReceipt() {
+                    if (!this.calcLineItems.length) return;
+                    this.calcDownloading = true;
+                    try {
+                        const canvas = await this.drawQuoteReceipt();
+                        this.calcReceiptFileName = `receipt-${(this.calc.clientName || 'client').replace(/\s+/g, '-').toLowerCase()}.png`;
+                        this.calcReceiptImageUrl = canvas.toDataURL('image/png');
+                        this.showCalcReceiptModal = true;
+                    } finally {
+                        this.calcDownloading = false;
+                    }
+                },
+
+                // Saves a data-URL image as a real file download (falls back to opening it in a new tab)
+                downloadImage(dataUrl, fileName) {
+                    try {
+                        const bin = atob(dataUrl.split(',')[1]);
+                        const bytes = new Uint8Array(bin.length);
+                        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                        const url = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    } catch (e) {
+                        window.open(dataUrl, '_blank');
                     }
                 },
 

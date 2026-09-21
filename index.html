@@ -334,6 +334,68 @@
             </div>
         </section>
 
+        <!-- ============ PRICE LIST (for reference only) ============ -->
+        <section id="prices" class="mb-14 max-w-xl mx-auto scroll-mt-24">
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">What it costs</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Price list</h2>
+                <p class="text-sm text-plum-400 mt-2">Just so you know the rates. Jen sends your total once she sees your design.</p>
+            </div>
+            <div class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 sm:p-8 space-y-7">
+                <div>
+                    <div class="glam-divider mb-3"><span class="font-serif text-lg text-plum-700 whitespace-nowrap px-1">Base service</span></div>
+                    <ul class="space-y-2.5 text-sm mt-4">
+                        <template x-for="[key, item] in Object.entries(pricing.base_services)" :key="key">
+                            <li class="flex items-baseline gap-2">
+                                <span class="text-plum-800" x-text="item.label"></span>
+                                <span class="flex-1 border-b border-dotted border-gold-300 translate-y-[-3px]" aria-hidden="true"></span>
+                                <span class="font-serif font-semibold text-rose-600 whitespace-nowrap">₱<span x-text="item.price"></span></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div>
+                    <div class="glam-divider mb-3"><span class="font-serif text-lg text-plum-700 whitespace-nowrap px-1">Full set design</span></div>
+                    <p class="text-xs text-plum-400 text-center -mt-1 mb-3">Added on top of the base service</p>
+                    <ul class="space-y-2.5 text-sm">
+                        <template x-for="[key, item] in Object.entries(pricing.full_set_designs)" :key="key">
+                            <li class="flex items-baseline gap-2">
+                                <span class="text-plum-800" x-text="item.label"></span>
+                                <span class="flex-1 border-b border-dotted border-gold-300 translate-y-[-3px]" aria-hidden="true"></span>
+                                <span class="font-serif font-semibold text-rose-600 whitespace-nowrap">+ ₱<span x-text="item.price"></span></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div>
+                    <div class="glam-divider mb-3"><span class="font-serif text-lg text-plum-700 whitespace-nowrap px-1">Per-nail add-ons</span></div>
+                    <ul class="space-y-2.5 text-sm mt-4">
+                        <template x-for="[key, item] in Object.entries(pricing.addons)" :key="key">
+                            <li class="flex items-baseline gap-2">
+                                <span class="text-plum-800" x-text="item.label"></span>
+                                <span class="flex-1 border-b border-dotted border-gold-300 translate-y-[-3px]" aria-hidden="true"></span>
+                                <span class="font-serif font-semibold text-rose-600 whitespace-nowrap">₱<span x-text="item.price"></span></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div>
+                    <div class="glam-divider mb-3"><span class="font-serif text-lg text-plum-700 whitespace-nowrap px-1">Removal</span></div>
+                    <ul class="space-y-2.5 text-sm mt-4">
+                        <template x-for="[key, item] in Object.entries(pricing.removal)" :key="key">
+                            <li class="flex items-baseline gap-2">
+                                <span class="text-plum-800" x-text="item.label"></span>
+                                <span class="flex-1 border-b border-dotted border-gold-300 translate-y-[-3px]" aria-hidden="true"></span>
+                                <span class="font-serif font-semibold text-rose-600 whitespace-nowrap">+ ₱<span x-text="item.price"></span></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <p class="text-xs text-plum-400 text-center pt-1">Home Service has a travel fee based on distance, confirmed once Jen sees your address.</p>
+            </div>
+        </section>
+
         <!-- ============ HOW IT WORKS ============ -->
         <section class="mb-14 max-w-3xl mx-auto">
             <div class="text-center mb-6">
@@ -604,14 +666,79 @@
             </div>
         </section>
 
+        <!-- ============ FEEDBACK ============ -->
+        <!-- Clients rate and write here; it opens Messenger with their feedback pre-filled (no server needed).
+             To show a review publicly, add it to the `reviews` list in the script at the bottom of this file. -->
+        <section id="feedback" class="mt-16 max-w-md mx-auto scroll-mt-24">
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Tell Jen how it went</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Leave feedback</h2>
+            </div>
+
+            <template x-if="reviews.length">
+                <div class="mb-6 space-y-3">
+                    <p class="text-center text-sm text-plum-400">
+                        <span class="text-gold-500 tracking-wider" x-text="stars(Math.round(avgRating))"></span>
+                        <span x-text="avgRating.toFixed(1) + ' from ' + reviews.length + (reviews.length === 1 ? ' review' : ' reviews')"></span>
+                    </p>
+                    <template x-for="(r, i) in reviews" :key="i">
+                        <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-4">
+                            <p class="text-gold-500 tracking-wider text-sm" x-text="stars(r.rating)"></p>
+                            <p class="text-sm text-plum-500 mt-1" x-text="r.text"></p>
+                            <p class="text-xs text-plum-400 mt-2" x-text="'— ' + (r.name || 'Client')"></p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <form x-show="!feedback.sent" @submit.prevent="submitFeedback" class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 space-y-4">
+                <div>
+                    <label class="block text-sm mb-1">Your name (optional)</label>
+                    <input type="text" x-model="feedback.name"
+                           class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">How was your set?</label>
+                    <div class="flex items-center gap-1" @mouseleave="feedback.hover = 0">
+                        <template x-for="n in 5" :key="n">
+                            <button type="button" @click="feedback.rating = n; feedback.error = false" @mouseenter="feedback.hover = n"
+                                    :aria-label="n + (n === 1 ? ' star' : ' stars')" :aria-pressed="feedback.rating === n"
+                                    class="text-4xl leading-none px-0.5 transition-colors"
+                                    :class="n <= (feedback.hover || feedback.rating) ? 'text-gold-400' : 'text-rose-200'">★</button>
+                        </template>
+                        <span class="ml-2 text-sm text-plum-400" x-text="ratingLabels[feedback.hover || feedback.rating]"></span>
+                    </div>
+                    <p x-show="feedback.error" x-cloak class="text-xs text-rose-500 mt-1">Please tap a star from 1 to 5.</p>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Your feedback</label>
+                    <textarea x-model="feedback.text" rows="3" placeholder="What did you love? Anything Jen can do better?"
+                              class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400"></textarea>
+                </div>
+                <button type="submit" class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    Send feedback
+                </button>
+            </form>
+
+            <div x-show="feedback.sent" x-cloak class="bg-white rounded-2xl shadow-sm border border-rose-100 p-6 text-center space-y-3">
+                <div class="text-3xl">💖</div>
+                <p class="font-serif font-semibold text-rose-600 text-lg">Almost done!</p>
+                <p class="text-sm text-plum-400">Tap below to send your feedback to Jen. It isn't sent until you do.</p>
+                <a :href="feedbackMessengerLink" target="_blank" class="glam-button block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam">Send on Messenger</a>
+                <a :href="feedbackWhatsappLink" target="_blank" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">Prefer WhatsApp instead?</a>
+                <button type="button" @click="feedback = { name: '', rating: 0, hover: 0, text: '', sent: false, error: false }" class="block w-full text-xs text-rose-500 hover:underline">Write another</button>
+            </div>
+        </section>
+
         <!-- ============ CONTACT ============ -->
         <section id="contact" class="mt-16 max-w-md mx-auto text-center scroll-mt-24">
             <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
             <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Get in touch' : 'Makipag-ugnayan'"></p>
             <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-6" x-text="$store.site.lang === 'en' ? 'Say hi' : 'Kumusta'"></h2>
 
-            <div class="grid grid-cols-2 gap-3 mb-8">
-                <a :href="messengerLink" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <a :href="plainMessengerLink" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
                     <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.02 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.196 2.238.196v2.459h-1.26c-1.243 0-1.63.771-1.63 1.562v1.877h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.92 8.437-9.94z"/>
                     </svg>
@@ -625,9 +752,20 @@
                 </a>
             </div>
 
+            <a :href="mapsUrl" target="_blank" rel="noopener" class="flex items-center justify-center gap-3 bg-white/80 border border-gold-200/60 rounded-2xl py-4 px-4 mb-8 hover:border-gold-400 transition-colors">
+                <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <span class="text-left">
+                    <span class="block text-sm text-plum-500">Home Base: Paliparan 2, Dasmariñas, Cavite</span>
+                    <span class="block text-xs text-plum-400">Open in Google Maps</span>
+                </span>
+            </a>
+
             <div class="bg-rose-50 border border-gold-200/60 rounded-2xl px-5 py-4">
                 <p class="text-sm text-rose-600 font-medium" x-text="$store.site.lang === 'en' ? '💕 Refer a friend, get ₱20 off!' : '💕 Mag-refer ng kaibigan, ₱20 discount!'"></p>
-                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱20 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱50 off sa susunod mong set.'"></p>
+                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱20 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱20 off sa susunod mong set.'"></p>
             </div>
         </section>
 
@@ -720,25 +858,6 @@
                     </fieldset>
 
                     <fieldset>
-                        <legend class="font-serif text-lg text-plum-700 mb-2">Nail color (optional)</legend>
-                        <div class="flex flex-wrap gap-3">
-                            <template x-for="[hex, label] in commonColors" :key="hex">
-                                <button type="button" @click="calc.nailColor = calc.nailColor === label ? '' : label"
-                                        :aria-pressed="calc.nailColor === label" :aria-label="label"
-                                        class="flex flex-col items-center gap-1 w-16 group">
-                                    <span :style="'background-color:' + hex"
-                                          class="w-9 h-9 rounded-full border-2 transition-all"
-                                          :class="calc.nailColor === label ? 'border-gold-500 ring-2 ring-gold-300 shadow-glam' : 'border-gray-200 group-hover:border-gold-300'"></span>
-                                    <span class="text-[11px] text-plum-400 text-center leading-tight" x-text="label"></span>
-                                </button>
-                            </template>
-                        </div>
-                        <button type="button" @click="calc.nailColor = calc.nailColor === 'Other / Custom' ? '' : 'Other / Custom'"
-                                class="mt-3 border rounded-xl px-4 py-2 text-sm transition-colors"
-                                :class="calc.nailColor === 'Other / Custom' ? 'border-gold-400 bg-rose-50/70' : 'border-gray-200'">Other / Custom</button>
-                    </fieldset>
-
-                    <fieldset>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" x-model="calc.homeService"
                                    class="text-rose-500 focus:ring-rose-400 rounded">
@@ -759,6 +878,18 @@
                             <input type="text" x-model="calc.clientName"
                                    class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
                         </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm mb-1">Appointment date</label>
+                                <input type="date" x-model="calc.appointmentDate"
+                                       class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Appointment time</label>
+                                <input type="time" x-model="calc.appointmentTime"
+                                       class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                            </div>
+                        </div>
                         <div>
                             <label class="block text-sm mb-1">Client's inspo photo (optional)</label>
                             <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
@@ -766,7 +897,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                                 </svg>
                                 <span class="text-sm text-plum-500" x-text="calc.inspoFileName || 'Tap to attach the client\'s inspo photo'"></span>
-                                <input type="file" accept="image/*" class="hidden" @change="handleInspoFile($event)">
+                                <input type="file" accept="image/*" class="hidden" x-ref="inspoInput" @change="handleInspoFile($event)">
                             </label>
                         </div>
                     </fieldset>
@@ -809,6 +940,7 @@
                                 class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2">
                             <span x-text="calcDownloading ? 'Preparing image…' : 'Download receipt'"></span>
                         </button>
+                        <button type="button" @click="resetCalc" class="w-full text-center text-xs text-plum-400 hover:text-rose-500 underline mt-2">New client (clear everything)</button>
                     </div>
                 </aside>
             </div>
@@ -850,6 +982,8 @@
         // ── Edit this to point at your own Facebook Page username ──
         const FACEBOOK_USERNAME = '61593421694869';
         const WHATSAPP_NUMBER = '639693661029';
+        // Google Maps link for Home Base. For an exact pin, open your place in Google Maps > Share > copy link, and paste it here.
+        const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Paliparan 2, Dasmariñas, Cavite');
 
         const pricing = {
             base_services: {
@@ -961,6 +1095,24 @@
             Stiletto: 'M13 52 Q13 56 17 56 L27 56 Q31 56 31 52 L22 6 Z',
         };
 
+        // Fresh, empty state for Jen's calculator (also used by "New client")
+        function newCalcState() {
+            const n = new Date();
+            return {
+                baseService: '',
+                fullSetDesignType: '',
+                addons: {},
+                removalOption: '',
+                homeService: false,
+                homeServiceFee: '',
+                clientName: '',
+                appointmentDate: `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`,
+                appointmentTime: '',
+                inspoFileName: '',
+                inspoDataUrl: null,
+            };
+        }
+
         function bookingPage() {
             return {
                 pricing,
@@ -971,7 +1123,6 @@
                 receiptImageUrl: null,
                 receiptFileName: 'booking-receipt.png',
                 guideModal: { open: false, src: '', title: '' },
-                commonColors: Object.entries(pricing.nail_color_groups.find(g => g.category === 'Signature Shades').colors),
                 guides: [
                     { src: 'images/nail-shapes-guide.jpg', title: 'Shape guide' },
                     { src: 'images/color-guide.jpg', title: 'Color guide' },
@@ -1010,18 +1161,7 @@
                 },
 
                 // Jen's private price calculator (separate from the client booking form)
-                calc: {
-                    baseService: '',
-                    fullSetDesignType: '',
-                    addons: {},
-                    removalOption: '',
-                    nailColor: '',
-                    homeService: false,
-                    homeServiceFee: '',
-                    clientName: '',
-                    inspoFileName: '',
-                    inspoDataUrl: null,
-                },
+                calc: newCalcState(),
 
                 shapeIcon(shape) {
                     const path = shapePaths[shape] || shapePaths.Round;
@@ -1030,6 +1170,56 @@
 
                 openGuide(src, title) {
                     this.guideModal = { open: true, src, title };
+                },
+
+                resetCalc() {
+                    if (!confirm('Clear this quote and start a new client?')) return;
+                    this.calc = newCalcState();
+                    if (this.$refs.inspoInput) this.$refs.inspoInput.value = '';
+                },
+
+                // ---- Feedback ----
+                // Approved reviews to show on the site. Add one per client, e.g.:
+                // { name: 'Ana', rating: 5, text: 'Love my nails!' },
+                reviews: [],
+                feedback: { name: '', rating: 0, hover: 0, text: '', sent: false, error: false },
+                ratingLabels: ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'],
+                mapsUrl: MAPS_URL,
+
+                get plainMessengerLink() {
+                    return `https://m.me/${FACEBOOK_USERNAME}`;
+                },
+
+                stars(n) {
+                    return '★'.repeat(n) + '☆'.repeat(5 - n);
+                },
+
+                get avgRating() {
+                    return this.reviews.length ? this.reviews.reduce((t, r) => t + r.rating, 0) / this.reviews.length : 0;
+                },
+
+                get feedbackText() {
+                    const f = this.feedback;
+                    const lines = ['⭐ Feedback for Jen Nail Artistry', `Rating: ${f.rating}/5 ${'★'.repeat(f.rating)}`];
+                    if (f.name.trim()) lines.push(`Name: ${f.name.trim()}`);
+                    if (f.text.trim()) lines.push(`Feedback: ${f.text.trim()}`);
+                    return lines.join('\n');
+                },
+
+                get feedbackMessengerLink() {
+                    return `https://m.me/${FACEBOOK_USERNAME}?text=${encodeURIComponent(this.feedbackText)}`;
+                },
+
+                get feedbackWhatsappLink() {
+                    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(this.feedbackText)}`;
+                },
+
+                submitFeedback() {
+                    if (!this.feedback.rating) {
+                        this.feedback.error = true;
+                        return;
+                    }
+                    this.feedback.sent = true;
                 },
 
                 installApp() {
@@ -1438,8 +1628,17 @@
 
                     const meta = [];
                     if (this.calc.clientName) meta.push(['Client', this.calc.clientName]);
-                    if (this.calc.nailColor) meta.push(['Nail color', this.calc.nailColor]);
-                    meta.push(['Date', new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })]);
+                    const fmtOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+                    let dateObj = new Date();
+                    if (this.calc.appointmentDate) {
+                        const [yy, mm, dd] = this.calc.appointmentDate.split('-').map(Number);
+                        dateObj = new Date(yy, mm - 1, dd);
+                    }
+                    meta.push(['Date', dateObj.toLocaleDateString('en-PH', fmtOpts)]);
+                    if (this.calc.appointmentTime) {
+                        const [hh, mi] = this.calc.appointmentTime.split(':').map(Number);
+                        meta.push(['Time', `${hh % 12 || 12}:${String(mi).padStart(2, '0')} ${hh >= 12 ? 'PM' : 'AM'}`]);
+                    }
                     const items = this.calcLineItems;
 
                     // Photo is shown whole (fit inside the box), never cropped

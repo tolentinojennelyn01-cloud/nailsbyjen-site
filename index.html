@@ -750,145 +750,6 @@
             </div>
         </section>
 
-        <!-- ============ FEEDBACK ============ -->
-        <!-- Clients rate, write, and attach up to 2 nail photos here. Feedback is saved to Firebase as "pending"
-             and only appears in these date rooms after Jen sets approved:true on the doc in the Firebase console. -->
-        <section id="feedback" class="mt-16 max-w-md mx-auto scroll-mt-24" x-init="loadFeedback()">
-            <div class="text-center mb-6">
-                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
-                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Tell Jen how it went</p>
-                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Leave feedback</h2>
-            </div>
-
-            <!-- Feedback is grouped into one "room" per day, collapsed by default, so the page never floods -->
-            <div class="mb-6 text-center">
-                <template x-if="remote.count > 0">
-                    <p class="text-sm text-plum-400">
-                        <span class="text-gold-500 tracking-wider" x-text="stars(Math.round(remote.avg))"></span>
-                        <span x-text="remote.avg.toFixed(1) + ' from ' + remote.count + (remote.count === 1 ? ' review' : ' reviews')"></span>
-                    </p>
-                </template>
-                <p x-show="remote.loaded && remote.count === 0" x-cloak class="text-sm text-plum-400">No feedback yet. Be the first!</p>
-                <p x-show="remote.error" x-cloak class="text-xs text-rose-500 mt-1">Couldn't load feedback right now. Please try again later.</p>
-
-                <div x-show="remote.rooms.length" x-cloak class="mt-4 text-left bg-white/80 rounded-2xl border border-gold-200/60 divide-y divide-gold-100 overflow-hidden">
-                    <template x-for="room in remote.rooms" :key="room.dateKey">
-                        <div>
-                            <button type="button" @click="room.open = !room.open" :aria-expanded="room.open"
-                                    class="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-rose-50/60 transition-colors">
-                                <span class="text-sm font-medium text-plum-600" x-text="room.dateLabel"></span>
-                                <span class="flex items-center gap-2 text-xs text-plum-400">
-                                    <span x-text="room.items.length + (room.items.length === 1 ? ' review' : ' reviews')"></span>
-                                    <span class="transition-transform" :class="room.open ? 'rotate-45' : ''">+</span>
-                                </span>
-                            </button>
-                            <div x-show="room.open" x-cloak class="px-3 pb-3 space-y-3">
-                                <template x-for="(r, i) in room.items" :key="r.id || i">
-                                    <div class="bg-white rounded-xl border border-gold-200/60 p-4">
-                                        <p class="text-gold-500 tracking-wider text-sm" x-text="stars(r.rating)"></p>
-                                        <p class="text-sm text-plum-500 mt-1" x-show="r.comment" x-text="r.comment"></p>
-                                        <div class="grid grid-cols-3 gap-2 mt-2" x-show="r.photos && r.photos.length">
-                                            <template x-for="src in (r.photos || [])" :key="src">
-                                                <button type="button" @click="photoViewer = { open: true, src: src }"
-                                                        class="aspect-square rounded-lg overflow-hidden border border-gold-200/60">
-                                                    <img :src="src" alt="Client's nails" loading="lazy" class="w-full h-full object-cover">
-                                                </button>
-                                            </template>
-                                        </div>
-                                        <p class="text-xs text-plum-400 mt-2" x-text="'— ' + (r.name || 'Client')"></p>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <form x-show="!feedback.sent" @submit.prevent="submitFeedback" class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 space-y-4">
-                <div>
-                    <label class="block text-sm mb-1">Your name (optional)</label>
-                    <input type="text" x-model="feedback.name" maxlength="60"
-                           class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="block text-sm mb-1">How was your set?</label>
-                    <div class="flex items-center gap-1" @mouseleave="feedback.hover = 0">
-                        <template x-for="n in 5" :key="n">
-                            <button type="button" @click="feedback.rating = n; feedback.error = false" @mouseenter="feedback.hover = n"
-                                    :aria-label="n + (n === 1 ? ' star' : ' stars')" :aria-pressed="feedback.rating === n"
-                                    class="text-4xl leading-none px-0.5 transition-colors"
-                                    :class="n <= (feedback.hover || feedback.rating) ? 'text-gold-400' : 'text-rose-200'">★</button>
-                        </template>
-                        <span class="ml-2 text-sm text-plum-400" x-text="ratingLabels[feedback.hover || feedback.rating]"></span>
-                    </div>
-                    <p x-show="feedback.error" x-cloak class="text-xs text-rose-500 mt-1">Please tap a star from 1 to 5.</p>
-                </div>
-                <div>
-                    <label class="block text-sm mb-1">Your feedback</label>
-                    <textarea x-model="feedback.text" rows="3" maxlength="1000" placeholder="What did you love? Anything Jen can do better?"
-                              class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400"></textarea>
-                </div>
-
-                <!-- Photos of their nails -->
-                <div>
-                    <label class="block text-sm mb-1">Show off your nails (optional, up to 2 photos)</label>
-                    <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
-                        <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                        </svg>
-                        <span class="text-sm text-plum-500">Tap to add photos of your nails</span>
-                        <input type="file" accept="image/*" multiple class="hidden" @change="addFeedbackPhotos($event)">
-                    </label>
-                    <div x-show="feedbackPhotos.length" x-cloak class="flex gap-2 mt-2">
-                        <template x-for="(ph, i) in feedbackPhotos" :key="ph.preview">
-                            <div class="relative w-20 h-20">
-                                <img :src="ph.preview" alt="Your nail photo" class="w-full h-full object-cover rounded-lg border border-gold-200/60">
-                                <button type="button" @click="removeFeedbackPhoto(i)" aria-label="Remove photo"
-                                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-500 text-white text-sm leading-none">&times;</button>
-                            </div>
-                        </template>
-                    </div>
-                    <p class="text-xs text-plum-400 mt-2">Your feedback and photos may be shown on this page (grouped by day) after Jen approves them.</p>
-                </div>
-
-                <div x-show="feedbackError" x-cloak class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-600 space-y-2">
-                    <p x-text="feedbackError"></p>
-                    <a :href="feedbackMessengerLink" target="_blank" class="underline">Send it to Jen on Messenger instead</a>
-                </div>
-
-                <button type="submit" :disabled="feedbackBusy"
-                        class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all disabled:opacity-60">
-                    <span x-text="feedbackBusy ? 'Sending…' : 'Send feedback'"></span>
-                </button>
-            </form>
-
-            <div x-show="feedback.sent" x-cloak class="bg-white rounded-2xl shadow-sm border border-rose-100 p-6 text-center space-y-3">
-                <div class="text-3xl">💖</div>
-                <template x-if="feedback.saved">
-                    <div class="space-y-3">
-                        <p class="font-serif font-semibold text-rose-600 text-lg">Thank you!</p>
-                        <p class="text-sm text-plum-400">Your feedback was saved. It will show on this page once Jen approves it.</p>
-                        <a :href="feedbackMessengerLink" target="_blank" class="block w-full text-center border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3 hover:bg-rose-50 transition-all">Let Jen know on Messenger</a>
-                    </div>
-                </template>
-                <template x-if="!feedback.saved">
-                    <div class="space-y-3">
-                        <p class="font-serif font-semibold text-rose-600 text-lg">Almost done!</p>
-                        <p class="text-sm text-plum-400">Tap below to send your feedback to Jen. It isn't sent until you do.</p>
-                        <a :href="feedbackMessengerLink" target="_blank" class="glam-button block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam">Send on Messenger</a>
-                        <a :href="feedbackWhatsappLink" target="_blank" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">Prefer WhatsApp instead?</a>
-                    </div>
-                </template>
-                <button type="button" @click="resetFeedback" class="block w-full text-xs text-rose-500 hover:underline">Write another</button>
-            </div>
-
-            <!-- Big view of a client's nail photo -->
-            <div x-show="photoViewer.open" x-cloak class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-                 @click="photoViewer.open = false" @keydown.window.escape="photoViewer.open = false">
-                <button type="button" @click="photoViewer.open = false" aria-label="Close photo" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
-                <img :src="photoViewer.src" alt="Client's nails" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
-            </div>
-        </section>
 
         <!-- ============ CONTACT ============ -->
         <section id="contact" class="mt-16 max-w-md mx-auto text-center scroll-mt-24">
@@ -1129,6 +990,146 @@
             </div>
         </section>
     </main>
+
+        <!-- ============ FEEDBACK ============ -->
+        <!-- Clients rate, write, and attach up to 2 nail photos here. Feedback is saved to Firebase as "pending"
+             and only appears in these date rooms after Jen sets approved:true on the doc in the Firebase console. -->
+        <section id="feedback" class="mt-16 max-w-md mx-auto scroll-mt-24" x-init="loadFeedback()">
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Tell Jen how it went</p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Leave feedback</h2>
+            </div>
+
+            <!-- Feedback is grouped into one "room" per day, collapsed by default, so the page never floods -->
+            <div class="mb-6 text-center">
+                <template x-if="remote.count > 0">
+                    <p class="text-sm text-plum-400">
+                        <span class="text-gold-500 tracking-wider" x-text="stars(Math.round(remote.avg))"></span>
+                        <span x-text="remote.avg.toFixed(1) + ' from ' + remote.count + (remote.count === 1 ? ' review' : ' reviews')"></span>
+                    </p>
+                </template>
+                <p x-show="remote.loaded && remote.count === 0" x-cloak class="text-sm text-plum-400">No feedback yet. Be the first!</p>
+                <p x-show="remote.error" x-cloak class="text-xs text-rose-500 mt-1">Couldn't load feedback right now. Please try again later.</p>
+
+                <div x-show="remote.rooms.length" x-cloak class="mt-4 text-left bg-white/80 rounded-2xl border border-gold-200/60 divide-y divide-gold-100 overflow-hidden">
+                    <template x-for="room in remote.rooms" :key="room.dateKey">
+                        <div>
+                            <button type="button" @click="room.open = !room.open" :aria-expanded="room.open"
+                                    class="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-rose-50/60 transition-colors">
+                                <span class="text-sm font-medium text-plum-600" x-text="room.dateLabel"></span>
+                                <span class="flex items-center gap-2 text-xs text-plum-400">
+                                    <span x-text="room.items.length + (room.items.length === 1 ? ' review' : ' reviews')"></span>
+                                    <span class="transition-transform" :class="room.open ? 'rotate-45' : ''">+</span>
+                                </span>
+                            </button>
+                            <div x-show="room.open" x-cloak class="px-3 pb-3 space-y-3">
+                                <template x-for="(r, i) in room.items" :key="r.id || i">
+                                    <div class="bg-white rounded-xl border border-gold-200/60 p-4">
+                                        <p class="text-gold-500 tracking-wider text-sm" x-text="stars(r.rating)"></p>
+                                        <p class="text-sm text-plum-500 mt-1" x-show="r.comment" x-text="r.comment"></p>
+                                        <div class="grid grid-cols-3 gap-2 mt-2" x-show="r.photos && r.photos.length">
+                                            <template x-for="src in (r.photos || [])" :key="src">
+                                                <button type="button" @click="photoViewer = { open: true, src: src }"
+                                                        class="aspect-square rounded-lg overflow-hidden border border-gold-200/60">
+                                                    <img :src="src" alt="Client's nails" loading="lazy" class="w-full h-full object-cover">
+                                                </button>
+                                            </template>
+                                        </div>
+                                        <p class="text-xs text-plum-400 mt-2" x-text="'— ' + (r.name || 'Client')"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <form x-show="!feedback.sent" @submit.prevent="submitFeedback" class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 space-y-4">
+                <div>
+                    <label class="block text-sm mb-1">Your name (optional)</label>
+                    <input type="text" x-model="feedback.name" maxlength="60"
+                           class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">How was your set?</label>
+                    <div class="flex items-center gap-1" @mouseleave="feedback.hover = 0">
+                        <template x-for="n in 5" :key="n">
+                            <button type="button" @click="feedback.rating = n; feedback.error = false" @mouseenter="feedback.hover = n"
+                                    :aria-label="n + (n === 1 ? ' star' : ' stars')" :aria-pressed="feedback.rating === n"
+                                    class="text-4xl leading-none px-0.5 transition-colors"
+                                    :class="n <= (feedback.hover || feedback.rating) ? 'text-gold-400' : 'text-rose-200'">★</button>
+                        </template>
+                        <span class="ml-2 text-sm text-plum-400" x-text="ratingLabels[feedback.hover || feedback.rating]"></span>
+                    </div>
+                    <p x-show="feedback.error" x-cloak class="text-xs text-rose-500 mt-1">Please tap a star from 1 to 5.</p>
+                </div>
+                <div>
+                    <label class="block text-sm mb-1">Your feedback</label>
+                    <textarea x-model="feedback.text" rows="3" maxlength="1000" placeholder="What did you love? Anything Jen can do better?"
+                              class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400"></textarea>
+                </div>
+
+                <!-- Photos of their nails -->
+                <div>
+                    <label class="block text-sm mb-1">Show off your nails (optional, up to 2 photos)</label>
+                    <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
+                        <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                        <span class="text-sm text-plum-500">Tap to add photos of your nails</span>
+                        <input type="file" accept="image/*" multiple class="hidden" @change="addFeedbackPhotos($event)">
+                    </label>
+                    <div x-show="feedbackPhotos.length" x-cloak class="flex gap-2 mt-2">
+                        <template x-for="(ph, i) in feedbackPhotos" :key="ph.preview">
+                            <div class="relative w-20 h-20">
+                                <img :src="ph.preview" alt="Your nail photo" class="w-full h-full object-cover rounded-lg border border-gold-200/60">
+                                <button type="button" @click="removeFeedbackPhoto(i)" aria-label="Remove photo"
+                                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-500 text-white text-sm leading-none">&times;</button>
+                            </div>
+                        </template>
+                    </div>
+                    <p class="text-xs text-plum-400 mt-2">Your feedback and photos may be shown on this page (grouped by day) after Jen approves them.</p>
+                </div>
+
+                <div x-show="feedbackError" x-cloak class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-600 space-y-2">
+                    <p x-text="feedbackError"></p>
+                    <a :href="feedbackMessengerLink" target="_blank" class="underline">Send it to Jen on Messenger instead</a>
+                </div>
+
+                <button type="submit" :disabled="feedbackBusy"
+                        class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all disabled:opacity-60">
+                    <span x-text="feedbackBusy ? 'Sending…' : 'Send feedback'"></span>
+                </button>
+            </form>
+
+            <div x-show="feedback.sent" x-cloak class="bg-white rounded-2xl shadow-sm border border-rose-100 p-6 text-center space-y-3">
+                <div class="text-3xl">💖</div>
+                <template x-if="feedback.saved">
+                    <div class="space-y-3">
+                        <p class="font-serif font-semibold text-rose-600 text-lg">Thank you!</p>
+                        <p class="text-sm text-plum-400">Your feedback was saved. It will show on this page once Jen approves it.</p>
+                        <a :href="feedbackMessengerLink" target="_blank" class="block w-full text-center border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3 hover:bg-rose-50 transition-all">Let Jen know on Messenger</a>
+                    </div>
+                </template>
+                <template x-if="!feedback.saved">
+                    <div class="space-y-3">
+                        <p class="font-serif font-semibold text-rose-600 text-lg">Almost done!</p>
+                        <p class="text-sm text-plum-400">Tap below to send your feedback to Jen. It isn't sent until you do.</p>
+                        <a :href="feedbackMessengerLink" target="_blank" class="glam-button block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam">Send on Messenger</a>
+                        <a :href="feedbackWhatsappLink" target="_blank" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">Prefer WhatsApp instead?</a>
+                    </div>
+                </template>
+                <button type="button" @click="resetFeedback" class="block w-full text-xs text-rose-500 hover:underline">Write another</button>
+            </div>
+
+            <!-- Big view of a client's nail photo -->
+            <div x-show="photoViewer.open" x-cloak class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+                 @click="photoViewer.open = false" @keydown.window.escape="photoViewer.open = false">
+                <button type="button" @click="photoViewer.open = false" aria-label="Close photo" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
+                <img :src="photoViewer.src" alt="Client's nails" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
+            </div>
+        </section>
 
     <footer class="text-center py-10">
         <div class="max-w-xs mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>

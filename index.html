@@ -399,6 +399,64 @@
             </div>
         </section>
 
+        <!-- ============ AFTER CARE ============ -->
+        <section id="aftercare" class="mt-16 max-w-3xl mx-auto scroll-mt-24">
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Keep it fresh' : 'Panatilihing maganda'"></p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'After Care' : 'Pag-aalaga Pagkatapos'"></h2>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6M12 3v4M8 7h8l1 3a5 5 0 11-10 0l1-3z" />
+                        <circle cx="12" cy="14" r="1" fill="currentColor" stroke="none" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Cuticle oil, daily' : 'Cuticle oil, araw-araw'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Use cuticle oil daily, especially after using hand sanitizer.' : 'Gumamit ng cuticle oil araw-araw, lalo na pagkatapos gumamit ng hand sanitizer.'"></p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4-2-7-5-7-9V6l7-3 7 3v6c0 4-3 7-7 9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 12l1.8 1.8L15 10" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Not a tool' : 'Huwag gamiting tool'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Do not use your nails as a tool, for example when opening a soda can.' : 'Huwag gamitin ang kuko bilang tool, tulad ng pagbukas ng soda can.'"></p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21v-6a3 3 0 013-3h0a3 3 0 013 3v1M13 15v-3a2 2 0 114 0v3M17 15a2 2 0 114 0v3a4 4 0 01-4 4H9a4 4 0 01-4-4v-2" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Wear gloves' : 'Magsuot ng gloves'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Wear gloves whenever cleaning, especially when doing the dishes and interacting with harsh chemicals.' : 'Magsuot ng gloves kapag naglilinis, lalo na sa paghuhugas ng pinggan at sa paggamit ng malakas na kemikal.'"></p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0M4 19c2-2 4-2 6 0s4 2 6 0 4-2 6 0" />
+                        <rect x="7" y="6" width="10" height="6" rx="3" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Rinse after swimming' : 'Banlawan pagkatapos lumangoy'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Wash hands immediately after swimming to remove chlorine, which can weaken nails and fade polish.' : 'Maghugas ng kamay agad pagkatapos lumangoy para matanggal ang chlorine, na nagpapahina sa kuko at nagpapakupas ng kulay.'"></p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 5L9 15l-4-4M14 5l3 3M6 13l3 3" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Let Jen remove it' : 'Si Jen ang magtanggal'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Please consider scheduling an appointment to have your manicure removed safely. Do not remove it yourself.' : 'Mag-schedule ng appointment para ligtas na matanggal ang manicure. Huwag itong tanggalin mag-isa.'"></p>
+                </div>
+                <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-5 text-center">
+                    <svg class="w-9 h-9 mx-auto mb-3 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="15" rx="2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 9h16M8 3v3M16 3v3" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 14.5l2 2 4-4" />
+                    </svg>
+                    <p class="text-sm font-medium mb-1" x-text="$store.site.lang === 'en' ? 'Book regular refills' : 'Regular na pa-refill'"></p>
+                    <p class="text-xs text-plum-400" x-text="$store.site.lang === 'en' ? 'Schedule regular appointments to maintain your manicure.' : 'Mag-schedule ng regular na appointment para mapanatili ang manicure mo.'"></p>
+                </div>
+            </div>
+        </section>
+
         <!-- ============ HOW IT WORKS ============ -->
         <section class="mb-14 max-w-3xl mx-auto">
             <div class="text-center mb-6">
@@ -709,6 +767,7 @@
 
             <button type="button" @click="submitted = false" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</button>
         </div>
+
 
         <!-- ============ FAQ / POLICIES ============ -->
         <section id="faq" class="mt-16 max-w-2xl mx-auto scroll-mt-24">
@@ -1336,7 +1395,6 @@
                     'images/nail-set-16.jpg', 'images/nail-set-17.jpg', 'images/nail-set-18.jpg',
                     'images/nail-set-19.jpg', 'images/nail-set-20.jpg', 'images/nail-set-21.jpg',
                     'images/nail-set-22.jpg', 'images/nail-set-23.jpg', 'images/nail-set-24.jpg',
-                    'images/nail-set-25.jpg', 'images/nail-set-26.jpg',
                 ],
                 form: {
                     customerName: '',

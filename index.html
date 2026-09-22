@@ -70,6 +70,9 @@
 
     <!-- Tailwind via CDN -- no build step needed, works great on GitHub Pages -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase (free database that stores approved client feedback) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -422,6 +425,82 @@
             </div>
         </section>
 
+        <!-- ============ BOOKING CALENDAR ============ -->
+        <section class="mb-10 max-w-2xl mx-auto" x-show="!submitted" x-cloak>
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'See who\'s booked' : 'Tingnan kung sino ang nakabook'"></p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'Booking Calendar' : 'Kalendaryo ng Booking'"></h2>
+                <p class="text-xs text-plum-400 mt-2" x-text="$store.site.lang === 'en' ? 'Tap a date to see who\'s booked that day and at what time. Slots need at least 4 hours between appointments.' : 'I-tap ang petsa para makita kung sino ang nakabook sa araw na iyon at anong oras. Kailangan ng hindi bababa sa 4 na oras sa pagitan ng mga appointment.'"></p>
+            </div>
+
+            <div class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-4 sm:p-6">
+                <!-- Month nav -->
+                <div class="flex items-center justify-between mb-4">
+                    <button type="button" @click="calendarPrevMonth" aria-label="Previous month"
+                        class="w-9 h-9 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <p class="font-serif font-semibold text-plum-700" x-text="calendarMonthLabel"></p>
+                    <button type="button" @click="calendarNextMonth" aria-label="Next month"
+                        class="w-9 h-9 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+
+                <!-- Weekday header -->
+                <div class="grid grid-cols-7 gap-1 mb-1 text-center text-[11px] uppercase tracking-wide text-plum-400">
+                    <template x-for="d in ($store.site.lang === 'en' ? ['Su','Mo','Tu','We','Th','Fr','Sa'] : ['Li','Lu','Ma','Mi','Hu','Bi','Sa'])" :key="d">
+                        <span x-text="d"></span>
+                    </template>
+                </div>
+
+                <!-- Day grid -->
+                <div class="grid grid-cols-7 gap-1">
+                    <template x-for="(cell, idx) in calendarDays" :key="idx">
+                        <div>
+                            <template x-if="cell === null">
+                                <div></div>
+                            </template>
+                            <template x-if="cell !== null">
+                                <button type="button" @click="selectCalendarDay(cell.dateStr)"
+                                    class="w-full aspect-square rounded-lg text-sm flex flex-col items-center justify-center relative transition-colors"
+                                    :class="{
+                                        'bg-rose-600 text-white': calendar.selectedDate === cell.dateStr,
+                                        'bg-rose-50 text-plum-700 hover:bg-rose-100': calendar.selectedDate !== cell.dateStr && cell.bookings.length > 0,
+                                        'text-plum-500 hover:bg-rose-50': calendar.selectedDate !== cell.dateStr && cell.bookings.length === 0,
+                                        'ring-2 ring-gold-400': cell.isToday && calendar.selectedDate !== cell.dateStr
+                                    }">
+                                    <span x-text="cell.day"></span>
+                                    <span x-show="cell.bookings.length > 0"
+                                        class="absolute bottom-1 w-1.5 h-1.5 rounded-full"
+                                        :class="calendar.selectedDate === cell.dateStr ? 'bg-white' : 'bg-rose-500'"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <p class="text-center text-xs text-plum-400 mt-3" x-show="calendar.loading" x-text="$store.site.lang === 'en' ? 'Loading bookings…' : 'Nilo-load ang mga booking…'"></p>
+
+                <!-- Selected day panel -->
+                <div x-show="calendar.selectedDate" x-cloak class="mt-5 border-t border-gold-200/60 pt-4">
+                    <p class="font-serif font-semibold text-rose-600 mb-2" x-text="calendar.selectedDate"></p>
+                    <template x-if="(calendar.bookingsByDate[calendar.selectedDate] || []).length === 0">
+                        <p class="text-sm text-plum-400" x-text="$store.site.lang === 'en' ? 'No bookings yet — this day is wide open.' : 'Wala pang booking — bukas na bukas ang araw na ito.'"></p>
+                    </template>
+                    <ul class="space-y-1.5">
+                        <template x-for="b in (calendar.bookingsByDate[calendar.selectedDate] || [])" :key="b.time + b.name">
+                            <li class="flex items-center justify-between text-sm bg-rose-50/70 rounded-lg px-3 py-2">
+                                <span class="font-medium text-plum-700" x-text="b.name"></span>
+                                <span class="text-rose-600" x-text="formatTime12h(b.time)"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <!-- ============ BOOKING FORM ============ -->
         <div id="book" x-show="!submitted" class="max-w-2xl mx-auto scroll-mt-24">
 
@@ -531,8 +610,13 @@
                     <p class="text-xs text-plum-400 mt-1">JPG, PNG, or WEBP — up to 5MB. This photo will be included on your downloadable booking receipt.</p>
                 </div>
 
-                <button type="submit" class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    Send booking request
+                <div id="booking-conflict-warning" x-show="bookingConflictMessage" x-cloak
+                     class="bg-rose-50 border-2 border-rose-300 text-rose-700 text-sm rounded-xl px-4 py-3">
+                    <span x-text="bookingConflictMessage"></span>
+                </div>
+
+                <button type="submit" :disabled="savingBooking" class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 disabled:opacity-60 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
+                    <span x-text="savingBooking ? ($store.site.lang === 'en' ? 'Checking availability…' : 'Chine-check ang availability…') : ($store.site.lang === 'en' ? 'Send booking request' : 'Ipadala ang booking request')"></span>
                 </button>
             </form>
 
@@ -667,35 +751,63 @@
         </section>
 
         <!-- ============ FEEDBACK ============ -->
-        <!-- Clients rate and write here; it opens Messenger with their feedback pre-filled (no server needed).
-             To show a review publicly, add it to the `reviews` list in the script at the bottom of this file. -->
-        <section id="feedback" class="mt-16 max-w-md mx-auto scroll-mt-24">
+        <!-- Clients rate, write, and attach up to 2 nail photos here. Feedback is saved to Firebase as "pending"
+             and only appears in these date rooms after Jen sets approved:true on the doc in the Firebase console. -->
+        <section id="feedback" class="mt-16 max-w-md mx-auto scroll-mt-24" x-init="loadFeedback()">
             <div class="text-center mb-6">
                 <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
                 <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1">Tell Jen how it went</p>
                 <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600">Leave feedback</h2>
             </div>
 
-            <template x-if="reviews.length">
-                <div class="mb-6 space-y-3">
-                    <p class="text-center text-sm text-plum-400">
-                        <span class="text-gold-500 tracking-wider" x-text="stars(Math.round(avgRating))"></span>
-                        <span x-text="avgRating.toFixed(1) + ' from ' + reviews.length + (reviews.length === 1 ? ' review' : ' reviews')"></span>
+            <!-- Feedback is grouped into one "room" per day, collapsed by default, so the page never floods -->
+            <div class="mb-6 text-center">
+                <template x-if="remote.count > 0">
+                    <p class="text-sm text-plum-400">
+                        <span class="text-gold-500 tracking-wider" x-text="stars(Math.round(remote.avg))"></span>
+                        <span x-text="remote.avg.toFixed(1) + ' from ' + remote.count + (remote.count === 1 ? ' review' : ' reviews')"></span>
                     </p>
-                    <template x-for="(r, i) in reviews" :key="i">
-                        <div class="bg-white/80 rounded-2xl border border-gold-200/60 p-4">
-                            <p class="text-gold-500 tracking-wider text-sm" x-text="stars(r.rating)"></p>
-                            <p class="text-sm text-plum-500 mt-1" x-text="r.text"></p>
-                            <p class="text-xs text-plum-400 mt-2" x-text="'— ' + (r.name || 'Client')"></p>
+                </template>
+                <p x-show="remote.loaded && remote.count === 0" x-cloak class="text-sm text-plum-400">No feedback yet. Be the first!</p>
+                <p x-show="remote.error" x-cloak class="text-xs text-rose-500 mt-1">Couldn't load feedback right now. Please try again later.</p>
+
+                <div x-show="remote.rooms.length" x-cloak class="mt-4 text-left bg-white/80 rounded-2xl border border-gold-200/60 divide-y divide-gold-100 overflow-hidden">
+                    <template x-for="room in remote.rooms" :key="room.dateKey">
+                        <div>
+                            <button type="button" @click="room.open = !room.open" :aria-expanded="room.open"
+                                    class="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-rose-50/60 transition-colors">
+                                <span class="text-sm font-medium text-plum-600" x-text="room.dateLabel"></span>
+                                <span class="flex items-center gap-2 text-xs text-plum-400">
+                                    <span x-text="room.items.length + (room.items.length === 1 ? ' review' : ' reviews')"></span>
+                                    <span class="transition-transform" :class="room.open ? 'rotate-45' : ''">+</span>
+                                </span>
+                            </button>
+                            <div x-show="room.open" x-cloak class="px-3 pb-3 space-y-3">
+                                <template x-for="(r, i) in room.items" :key="r.id || i">
+                                    <div class="bg-white rounded-xl border border-gold-200/60 p-4">
+                                        <p class="text-gold-500 tracking-wider text-sm" x-text="stars(r.rating)"></p>
+                                        <p class="text-sm text-plum-500 mt-1" x-show="r.comment" x-text="r.comment"></p>
+                                        <div class="grid grid-cols-3 gap-2 mt-2" x-show="r.photos && r.photos.length">
+                                            <template x-for="src in (r.photos || [])" :key="src">
+                                                <button type="button" @click="photoViewer = { open: true, src: src }"
+                                                        class="aspect-square rounded-lg overflow-hidden border border-gold-200/60">
+                                                    <img :src="src" alt="Client's nails" loading="lazy" class="w-full h-full object-cover">
+                                                </button>
+                                            </template>
+                                        </div>
+                                        <p class="text-xs text-plum-400 mt-2" x-text="'— ' + (r.name || 'Client')"></p>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </template>
                 </div>
-            </template>
+            </div>
 
             <form x-show="!feedback.sent" @submit.prevent="submitFeedback" class="bg-white/90 rounded-3xl shadow-glam border border-gold-200/60 p-6 space-y-4">
                 <div>
                     <label class="block text-sm mb-1">Your name (optional)</label>
-                    <input type="text" x-model="feedback.name"
+                    <input type="text" x-model="feedback.name" maxlength="60"
                            class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
                 </div>
                 <div>
@@ -713,21 +825,68 @@
                 </div>
                 <div>
                     <label class="block text-sm mb-1">Your feedback</label>
-                    <textarea x-model="feedback.text" rows="3" placeholder="What did you love? Anything Jen can do better?"
+                    <textarea x-model="feedback.text" rows="3" maxlength="1000" placeholder="What did you love? Anything Jen can do better?"
                               class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400"></textarea>
                 </div>
-                <button type="submit" class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all">
-                    Send feedback
+
+                <!-- Photos of their nails -->
+                <div>
+                    <label class="block text-sm mb-1">Show off your nails (optional, up to 2 photos)</label>
+                    <label class="flex items-center gap-3 border-2 border-dashed border-rose-300 hover:border-gold-400 rounded-xl px-4 py-4 cursor-pointer transition-colors bg-rose-50/40">
+                        <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                        </svg>
+                        <span class="text-sm text-plum-500">Tap to add photos of your nails</span>
+                        <input type="file" accept="image/*" multiple class="hidden" @change="addFeedbackPhotos($event)">
+                    </label>
+                    <div x-show="feedbackPhotos.length" x-cloak class="flex gap-2 mt-2">
+                        <template x-for="(ph, i) in feedbackPhotos" :key="ph.preview">
+                            <div class="relative w-20 h-20">
+                                <img :src="ph.preview" alt="Your nail photo" class="w-full h-full object-cover rounded-lg border border-gold-200/60">
+                                <button type="button" @click="removeFeedbackPhoto(i)" aria-label="Remove photo"
+                                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-500 text-white text-sm leading-none">&times;</button>
+                            </div>
+                        </template>
+                    </div>
+                    <p class="text-xs text-plum-400 mt-2">Your feedback and photos may be shown on this page (grouped by day) after Jen approves them.</p>
+                </div>
+
+                <div x-show="feedbackError" x-cloak class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-600 space-y-2">
+                    <p x-text="feedbackError"></p>
+                    <a :href="feedbackMessengerLink" target="_blank" class="underline">Send it to Jen on Messenger instead</a>
+                </div>
+
+                <button type="submit" :disabled="feedbackBusy"
+                        class="glam-button w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 hover:from-rose-600 hover:to-gold-600 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3.5 shadow-glam transition-all disabled:opacity-60">
+                    <span x-text="feedbackBusy ? 'Sending…' : 'Send feedback'"></span>
                 </button>
             </form>
 
             <div x-show="feedback.sent" x-cloak class="bg-white rounded-2xl shadow-sm border border-rose-100 p-6 text-center space-y-3">
                 <div class="text-3xl">💖</div>
-                <p class="font-serif font-semibold text-rose-600 text-lg">Almost done!</p>
-                <p class="text-sm text-plum-400">Tap below to send your feedback to Jen. It isn't sent until you do.</p>
-                <a :href="feedbackMessengerLink" target="_blank" class="glam-button block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam">Send on Messenger</a>
-                <a :href="feedbackWhatsappLink" target="_blank" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">Prefer WhatsApp instead?</a>
-                <button type="button" @click="feedback = { name: '', rating: 0, hover: 0, text: '', sent: false, error: false }" class="block w-full text-xs text-rose-500 hover:underline">Write another</button>
+                <template x-if="feedback.saved">
+                    <div class="space-y-3">
+                        <p class="font-serif font-semibold text-rose-600 text-lg">Thank you!</p>
+                        <p class="text-sm text-plum-400">Your feedback was saved. It will show on this page once Jen approves it.</p>
+                        <a :href="feedbackMessengerLink" target="_blank" class="block w-full text-center border-2 border-rose-400 text-rose-600 font-medium tracking-wide uppercase text-sm rounded-xl py-3 hover:bg-rose-50 transition-all">Let Jen know on Messenger</a>
+                    </div>
+                </template>
+                <template x-if="!feedback.saved">
+                    <div class="space-y-3">
+                        <p class="font-serif font-semibold text-rose-600 text-lg">Almost done!</p>
+                        <p class="text-sm text-plum-400">Tap below to send your feedback to Jen. It isn't sent until you do.</p>
+                        <a :href="feedbackMessengerLink" target="_blank" class="glam-button block w-full bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white font-medium tracking-wide uppercase text-sm rounded-xl py-3 shadow-glam">Send on Messenger</a>
+                        <a :href="feedbackWhatsappLink" target="_blank" class="block w-full text-xs text-plum-400 hover:text-rose-500 underline">Prefer WhatsApp instead?</a>
+                    </div>
+                </template>
+                <button type="button" @click="resetFeedback" class="block w-full text-xs text-rose-500 hover:underline">Write another</button>
+            </div>
+
+            <!-- Big view of a client's nail photo -->
+            <div x-show="photoViewer.open" x-cloak class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+                 @click="photoViewer.open = false" @keydown.window.escape="photoViewer.open = false">
+                <button type="button" @click="photoViewer.open = false" aria-label="Close photo" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
+                <img :src="photoViewer.src" alt="Client's nails" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
             </div>
         </section>
 
@@ -983,6 +1142,23 @@
         const FACEBOOK_USERNAME = '61593421694869';
         const WHATSAPP_NUMBER = '639693661029';
         // Google Maps link for Home Base. For an exact pin, open your place in Google Maps > Share > copy link, and paste it here.
+        // ── Client feedback room (Firebase, free) ──
+        // Config from Firebase console > Project settings > Your apps. Safe to be public.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIvn1QuzTpGsohhehW1EUvviKBmrCvERs",
+            authDomain: "nails-by-jen.firebaseapp.com",
+            projectId: "nails-by-jen",
+            storageBucket: "nails-by-jen.firebasestorage.app",
+            messagingSenderId: "915239439604",
+            appId: "1:915239439604:web:b5c8fe7dbea21be7dc62a1",
+            measurementId: "G-DRSHQRJV40",
+        };
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        } catch (e) { console.error('Firebase failed to start', e); }
+
         const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Paliparan 2, Dasmariñas, Cavite');
 
         const pricing = {
@@ -1138,6 +1314,17 @@
                 isIOSDevice: /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream,
                 fileName: '',
                 referenceImageDataUrl: null,
+
+                // ── Booking calendar: shows who's booked on which day, and blocks slots < 4hrs apart ──
+                calendar: {
+                    year: new Date().getFullYear(),
+                    month: new Date().getMonth(), // 0-indexed
+                    selectedDate: null,           // 'YYYY-MM-DD'
+                    bookingsByDate: {},            // { 'YYYY-MM-DD': [{ name, time }, ...] }
+                    loading: false,
+                },
+                bookingConflictMessage: '',
+                savingBooking: false,
                 lightboxIndex: null,
                 galleryImages: [
                     'images/nail-set-1.jpg', 'images/nail-set-2.jpg', 'images/nail-set-3.jpg',
@@ -1148,8 +1335,6 @@
                     'images/nail-set-16.jpg', 'images/nail-set-17.jpg', 'images/nail-set-18.jpg',
                     'images/nail-set-19.jpg', 'images/nail-set-20.jpg', 'images/nail-set-21.jpg',
                     'images/nail-set-22.jpg', 'images/nail-set-23.jpg', 'images/nail-set-24.jpg',
-                    'images/nail-set-25.jpg', 'images/nail-set-26.jpg', 
-                    
                 ],
                 form: {
                     customerName: '',
@@ -1165,9 +1350,135 @@
                 // Jen's private price calculator (separate from the client booking form)
                 calc: newCalcState(),
 
+                init() {
+                    this.loadCalendarBookings();
+                },
+
                 shapeIcon(shape) {
                     const path = shapePaths[shape] || shapePaths.Round;
                     return `<svg viewBox="0 0 44 60" class="w-8 h-11"><path d="${path}" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>`;
+                },
+
+                // ── Booking calendar ──
+                async loadCalendarBookings() {
+                    if (!db) return;
+                    this.calendar.loading = true;
+                    try {
+                        const y = this.calendar.year, m = this.calendar.month;
+                        const pad = (n) => String(n).padStart(2, '0');
+                        const start = `${y}-${pad(m + 1)}-01`;
+                        const lastDay = new Date(y, m + 1, 0).getDate();
+                        const end = `${y}-${pad(m + 1)}-${pad(lastDay)}`;
+                        const snap = await db.collection('bookings')
+                            .where('preferredDate', '>=', start)
+                            .where('preferredDate', '<=', end)
+                            .get();
+                        const map = {};
+                        snap.forEach((doc) => {
+                            const b = doc.data();
+                            if (!b.preferredDate || !b.preferredTime) return;
+                            if (!map[b.preferredDate]) map[b.preferredDate] = [];
+                            map[b.preferredDate].push({ name: b.customerName || 'Guest', time: b.preferredTime });
+                        });
+                        Object.values(map).forEach((list) => list.sort((a, b) => a.time.localeCompare(b.time)));
+                        this.calendar.bookingsByDate = map;
+                    } catch (e) {
+                        console.error('Failed to load calendar bookings', e);
+                    } finally {
+                        this.calendar.loading = false;
+                    }
+                },
+
+                calendarPrevMonth() {
+                    this.calendar.month--;
+                    if (this.calendar.month < 0) { this.calendar.month = 11; this.calendar.year--; }
+                    this.calendar.selectedDate = null;
+                    this.loadCalendarBookings();
+                },
+
+                calendarNextMonth() {
+                    this.calendar.month++;
+                    if (this.calendar.month > 11) { this.calendar.month = 0; this.calendar.year++; }
+                    this.calendar.selectedDate = null;
+                    this.loadCalendarBookings();
+                },
+
+                get calendarMonthLabel() {
+                    const lang = (window.Alpine && Alpine.store('site')) ? Alpine.store('site').lang : 'en';
+                    const locale = lang === 'tl' ? 'fil-PH' : 'en-US';
+                    return new Date(this.calendar.year, this.calendar.month, 1)
+                        .toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+                },
+
+                get calendarDays() {
+                    const y = this.calendar.year, m = this.calendar.month;
+                    const pad = (n) => String(n).padStart(2, '0');
+                    const firstDayIndex = new Date(y, m, 1).getDay(); // 0 = Sun
+                    const daysInMonth = new Date(y, m + 1, 0).getDate();
+                    const todayStr = (() => { const t = new Date(); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; })();
+                    const days = [];
+                    for (let i = 0; i < firstDayIndex; i++) days.push(null);
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const dateStr = `${y}-${pad(m + 1)}-${pad(d)}`;
+                        days.push({
+                            day: d,
+                            dateStr,
+                            isToday: dateStr === todayStr,
+                            bookings: this.calendar.bookingsByDate[dateStr] || [],
+                        });
+                    }
+                    return days;
+                },
+
+                selectCalendarDay(dateStr) {
+                    if (!dateStr) return;
+                    this.calendar.selectedDate = (this.calendar.selectedDate === dateStr) ? null : dateStr;
+                },
+
+                formatTime12h(t) {
+                    if (!t) return '';
+                    const [h, min] = t.split(':').map(Number);
+                    const period = h >= 12 ? 'PM' : 'AM';
+                    const h12 = (h % 12) === 0 ? 12 : (h % 12);
+                    return `${h12}:${String(min).padStart(2, '0')} ${period}`;
+                },
+
+                // Returns true if the requested date/time is within 4 hours of an existing booking that day
+                async hasBookingConflict(dateStr, timeStr) {
+                    if (!db) return false;
+                    try {
+                        const snap = await db.collection('bookings').where('preferredDate', '==', dateStr).get();
+                        const [h, m] = timeStr.split(':').map(Number);
+                        const newMinutes = (h * 60) + m;
+                        let conflict = false;
+                        snap.forEach((doc) => {
+                            const b = doc.data();
+                            if (!b.preferredTime) return;
+                            const [bh, bm] = b.preferredTime.split(':').map(Number);
+                            const diff = Math.abs(((bh * 60) + bm) - newMinutes);
+                            if (diff < 240) conflict = true;
+                        });
+                        return conflict;
+                    } catch (e) {
+                        console.error('Booking conflict check failed', e);
+                        return false; // fail open — Jen still confirms manually on Messenger
+                    }
+                },
+
+                async saveBookingToCalendar() {
+                    if (!db || !this.form.preferredDate || !this.form.preferredTime) return;
+                    try {
+                        await db.collection('bookings').add({
+                            customerName: this.form.customerName || 'Guest',
+                            preferredDate: this.form.preferredDate,
+                            preferredTime: this.form.preferredTime,
+                            serviceLocation: this.form.serviceLocation || null,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                        this.loadCalendarBookings();
+                    } catch (e) {
+                        console.error('Failed to save booking to calendar', e);
+                    }
                 },
 
                 openGuide(src, title) {
@@ -1180,11 +1491,13 @@
                     if (this.$refs.inspoInput) this.$refs.inspoInput.value = '';
                 },
 
-                // ---- Feedback ----
-                // Approved reviews to show on the site. Add one per client, e.g.:
-                // { name: 'Ana', rating: 5, text: 'Love my nails!' },
-                reviews: [],
-                feedback: { name: '', rating: 0, hover: 0, text: '', sent: false, error: false },
+                // ---- Feedback (stored in Firebase, grouped into a "room" per day) ----
+                remote: { count: 0, avg: 0, rooms: [], loading: false, error: false, loaded: false },
+                feedback: { name: '', rating: 0, hover: 0, text: '', sent: false, saved: false, photoCount: 0, error: false },
+                feedbackPhotos: [],
+                feedbackBusy: false,
+                feedbackError: '',
+                photoViewer: { open: false, src: '' },
                 ratingLabels: ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'],
                 mapsUrl: MAPS_URL,
 
@@ -1196,8 +1509,107 @@
                     return '★'.repeat(n) + '☆'.repeat(5 - n);
                 },
 
-                get avgRating() {
-                    return this.reviews.length ? this.reviews.reduce((t, r) => t + r.rating, 0) / this.reviews.length : 0;
+                // Today's date in Asia/Manila as 'YYYY-MM-DD', used to group feedback by day
+                manilaDateKey(d = new Date()) {
+                    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+                },
+
+                dateKeyLabel(dateKey) {
+                    const [y, m, d] = dateKey.split('-').map(Number);
+                    return new Date(y, m - 1, d).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+                },
+
+                // Loads every approved review once, then groups them into date "rooms" (collapsed by default)
+                async loadFeedback() {
+                    if (!db || this.remote.loading) return;
+                    this.remote.loading = true;
+                    this.remote.error = false;
+                    try {
+                        const snap = await db.collection('feedback').where('approved', '==', true).get();
+                        const rows = snap.docs.map(doc => {
+                            const data = doc.data();
+                            return { id: doc.id, ...data, _ms: data.created_at && data.created_at.toMillis ? data.created_at.toMillis() : 0 };
+                        });
+                        rows.sort((a, b) => b._ms - a._ms);
+
+                        const byDate = new Map();
+                        rows.forEach(r => {
+                            const key = r.dateKey || this.manilaDateKey(r._ms ? new Date(r._ms) : new Date());
+                            if (!byDate.has(key)) byDate.set(key, []);
+                            byDate.get(key).push(r);
+                        });
+                        this.remote.rooms = [...byDate.entries()]
+                            .sort((a, b) => b[0].localeCompare(a[0]))
+                            .map(([dateKey, items]) => ({ dateKey, dateLabel: this.dateKeyLabel(dateKey), items, open: false }));
+
+                        this.remote.count = rows.length;
+                        this.remote.avg = rows.length ? rows.reduce((t, r) => t + r.rating, 0) / rows.length : 0;
+                        this.remote.loaded = true;
+                    } catch (e) {
+                        this.remote.error = true;
+                    } finally {
+                        this.remote.loading = false;
+                    }
+                },
+
+                // Shrinks a photo to max 700px JPEG, small enough to store inside the Firestore document itself
+                compressImage(file) {
+                    return new Promise((resolve, reject) => {
+                        const url = URL.createObjectURL(file);
+                        const img = new Image();
+                        img.onload = () => {
+                            URL.revokeObjectURL(url);
+                            const scale = Math.min(1, 700 / Math.max(img.width, img.height));
+                            const c = document.createElement('canvas');
+                            c.width = Math.round(img.width * scale);
+                            c.height = Math.round(img.height * scale);
+                            const ctx = c.getContext('2d');
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(0, 0, c.width, c.height);
+                            ctx.drawImage(img, 0, 0, c.width, c.height);
+                            const attempt = (q) => c.toBlob((blob) => {
+                                if (!blob) return reject(new Error('blob'));
+                                if (blob.size > 180000 && q > 0.35) return attempt(q - 0.15);
+                                resolve(blob);
+                            }, 'image/jpeg', q);
+                            attempt(0.75);
+                        };
+                        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load')); };
+                        img.src = url;
+                    });
+                },
+
+                blobToDataUrl(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = () => reject(new Error('read'));
+                        reader.readAsDataURL(blob);
+                    });
+                },
+
+                async addFeedbackPhotos(event) {
+                    const files = [...event.target.files];
+                    event.target.value = '';
+                    this.feedbackError = '';
+                    for (const f of files) {
+                        if (this.feedbackPhotos.length >= 2) {
+                            this.feedbackError = 'You can attach up to 2 photos.';
+                            break;
+                        }
+                        if (!f.type.startsWith('image/')) continue;
+                        try {
+                            const blob = await this.compressImage(f);
+                            this.feedbackPhotos.push({ preview: URL.createObjectURL(blob), blob });
+                        } catch (e) {
+                            this.feedbackError = "Sorry, we couldn't read one of the photos. Try a JPG or PNG.";
+                        }
+                    }
+                },
+
+                removeFeedbackPhoto(i) {
+                    URL.revokeObjectURL(this.feedbackPhotos[i].preview);
+                    this.feedbackPhotos.splice(i, 1);
                 },
 
                 get feedbackText() {
@@ -1205,6 +1617,9 @@
                     const lines = ['⭐ Feedback for Jen Nail Artistry', `Rating: ${f.rating}/5 ${'★'.repeat(f.rating)}`];
                     if (f.name.trim()) lines.push(`Name: ${f.name.trim()}`);
                     if (f.text.trim()) lines.push(`Feedback: ${f.text.trim()}`);
+                    if (f.saved) {
+                        lines.push(`(Saved on the website, waiting for your approval${f.photoCount ? ', with ' + f.photoCount + ' photo' + (f.photoCount > 1 ? 's' : '') : ''})`);
+                    }
                     return lines.join('\n');
                 },
 
@@ -1216,12 +1631,47 @@
                     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(this.feedbackText)}`;
                 },
 
-                submitFeedback() {
+                async submitFeedback() {
                     if (!this.feedback.rating) {
                         this.feedback.error = true;
                         return;
                     }
-                    this.feedback.sent = true;
+                    if (this.feedbackBusy) return;
+                    this.feedbackError = '';
+                    if (!db) {
+                        this.feedbackError = "Sorry, we couldn't reach the feedback database. Please send it to Jen on Messenger instead.";
+                        return;
+                    }
+                    this.feedbackBusy = true;
+                    try {
+                        const photos = [];
+                        for (const ph of this.feedbackPhotos) {
+                            photos.push(await this.blobToDataUrl(ph.blob));
+                        }
+                        await db.collection('feedback').add({
+                            name: this.feedback.name.trim() || null,
+                            rating: this.feedback.rating,
+                            comment: this.feedback.text.trim() || null,
+                            photos: photos,
+                            approved: false,
+                            dateKey: this.manilaDateKey(),
+                            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                        this.feedback.photoCount = photos.length;
+                        this.feedback.saved = true;
+                        this.feedback.sent = true;
+                    } catch (e) {
+                        this.feedbackError = "Sorry, we couldn't save your feedback right now. Please try again, or send it to Jen on Messenger.";
+                    } finally {
+                        this.feedbackBusy = false;
+                    }
+                },
+
+                resetFeedback() {
+                    this.feedbackPhotos.forEach(ph => URL.revokeObjectURL(ph.preview));
+                    this.feedbackPhotos = [];
+                    this.feedbackError = '';
+                    this.feedback = { name: '', rating: 0, hover: 0, text: '', sent: false, saved: false, photoCount: 0, error: false };
                 },
 
                 installApp() {
@@ -1343,11 +1793,27 @@
                     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(this.summaryText)}`;
                 },
 
-                submitBooking() {
+                async submitBooking() {
+                    this.bookingConflictMessage = '';
+                    if (this.form.preferredDate && this.form.preferredTime) {
+                        this.savingBooking = true;
+                        const conflict = await this.hasBookingConflict(this.form.preferredDate, this.form.preferredTime);
+                        this.savingBooking = false;
+                        if (conflict) {
+                            this.bookingConflictMessage = this.$store.site.lang === 'en'
+                                ? 'That time is too close to another booking on this day — please leave at least 4 hours between appointments. Check the calendar above for open times.'
+                                : 'Masyadong malapit ang oras na iyan sa ibang booking sa araw na iyan — mangyaring mag-iwan ng hindi bababa sa 4 na oras sa pagitan ng mga appointment. Tingnan ang calendar sa itaas para sa mga bukas na oras.';
+                            this.$nextTick(() => {
+                                document.getElementById('booking-conflict-warning')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            });
+                            return;
+                        }
+                    }
                     this.submitted = true;
                     this.$nextTick(() => {
                         this.$refs.confirmationBlock?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     });
+                    this.saveBookingToCalendar();
                 },
 
                 copySummary() {

@@ -262,12 +262,18 @@
         </div>
     </header>
 
-    <!-- Sticky "Book Now" button, mobile only, hidden once you're actually at the booking form -->
+    <!-- Sticky "Book Now" button, mobile only, hidden once you're at the booking form or the footer -->
     <a href="#book" x-data="{ show: true }" x-init="
             const bookEl = document.getElementById('book');
+            const footerEl = document.querySelector('footer');
+            let atBook = false, atFooter = false;
             if (bookEl) {
-                const obs = new IntersectionObserver((entries) => { show = !entries[0].isIntersecting; }, { threshold: 0.05 });
-                obs.observe(bookEl);
+                const obsBook = new IntersectionObserver((entries) => { atBook = entries[0].isIntersecting; show = !atBook && !atFooter; }, { threshold: 0.05 });
+                obsBook.observe(bookEl);
+            }
+            if (footerEl) {
+                const obsFooter = new IntersectionObserver((entries) => { atFooter = entries[0].isIntersecting; show = !atBook && !atFooter; }, { threshold: 0.05 });
+                obsFooter.observe(footerEl);
             }
         "
        x-show="show"

@@ -146,12 +146,6 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
-        /* Mobile browsers render background-attachment:fixed unreliably — it can appear to
-           jump/scroll together with truly-fixed elements like the sticky Book Now button.
-           Switch to a normal scrolling background below the tablet breakpoint. */
-        @media (max-width: 768px) {
-            body { background-attachment: scroll; }
-        }
         .glam-divider {
             display: flex;
             align-items: center;

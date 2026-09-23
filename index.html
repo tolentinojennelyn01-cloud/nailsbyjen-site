@@ -145,6 +145,12 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
+        /* Mobile browsers render background-attachment:fixed unreliably — it can appear to
+           jump/scroll together with truly-fixed elements like the sticky Book Now button.
+           Switch to a normal scrolling background below the tablet breakpoint. */
+        @media (max-width: 768px) {
+            body { background-attachment: scroll; }
+        }
         .glam-divider {
             display: flex;
             align-items: center;
@@ -180,13 +186,15 @@
             50% { opacity: 1; transform: scale(1.04); }
         }
 
-        /* Scroll reveal for sections */
-        .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
-        .reveal.is-visible { opacity: 1; transform: translateY(0); }
+        /* Scroll reveal for sections (opacity only — a transform here would break any
+           position:fixed modal nested inside, like the gallery lightbox) */
+        .reveal { opacity: 0; transition: opacity 0.7s ease; }
+        .reveal.is-visible { opacity: 1; }
 
-        /* Gentle lift + deeper glow on glam cards when hovered/tapped */
-        .glam-card { transition: box-shadow 0.35s ease, transform 0.35s ease; }
-        .glam-card:hover { box-shadow: 0 16px 40px -12px rgba(194, 46, 81, 0.32), 0 4px 20px -4px rgba(212, 171, 77, 0.3); transform: translateY(-2px); }
+        /* Deeper glow on glam cards when hovered/tapped (shadow only, no transform —
+           a transform here could box in any fixed-position modal nested inside) */
+        .glam-card { transition: box-shadow 0.35s ease; }
+        .glam-card:hover { box-shadow: 0 16px 40px -12px rgba(194, 46, 81, 0.32), 0 4px 20px -4px rgba(212, 171, 77, 0.3); }
 
         /* Shimmering sheen that sweeps across the primary gradient buttons on hover */
         .glam-button { position: relative; overflow: hidden; }
@@ -834,43 +842,6 @@
         </section>
 
 
-        <!-- ============ CONTACT ============ -->
-        <section id="contact" class="reveal mt-16 max-w-md mx-auto text-center scroll-mt-24">
-            <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
-            <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Get in touch' : 'Makipag-ugnayan'"></p>
-            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-6" x-text="$store.site.lang === 'en' ? 'Say hi' : 'Kumusta'"></h2>
-
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <a :href="plainMessengerLink" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
-                    <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.02 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.196 2.238.196v2.459h-1.26c-1.243 0-1.63.771-1.63 1.562v1.877h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.92 8.437-9.94z"/>
-                    </svg>
-                    <span class="text-xs text-plum-500">Messenger</span>
-                </a>
-                <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
-                    <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 2c-2.716 0-3.056.012-4.123.06-1.064.05-1.79.218-2.427.465a4.9 4.9 0 00-1.772 1.153A4.9 4.9 0 002.525 5.45c-.247.637-.416 1.363-.465 2.427C2.012 8.944 2 9.284 2 12s.012 3.056.06 4.123c.05 1.064.218 1.79.465 2.427a4.9 4.9 0 001.153 1.772 4.9 4.9 0 001.772 1.153c.637.247 1.363.416 2.427.465C8.944 21.988 9.284 22 12 22s3.056-.012 4.123-.06c1.064-.05 1.79-.218 2.427-.465a4.9 4.9 0 001.772-1.153 4.9 4.9 0 001.153-1.772c.247-.637.416-1.363.465-2.427.048-1.067.06-1.407.06-4.123s-.012-3.056-.06-4.123c-.05-1.064-.218-1.79-.465-2.427a4.9 4.9 0 00-1.153-1.772A4.9 4.9 0 0018.55 2.525c-.637-.247-1.363-.416-2.427-.465C15.056 2.012 14.716 2 12 2zm0 1.802c2.67 0 2.987.01 4.042.059.976.045 1.505.207 1.858.344.467.181.8.398 1.15.748.35.35.567.683.748 1.15.137.353.3.882.344 1.858.049 1.055.059 1.372.059 4.042s-.01 2.987-.059 4.042c-.045.976-.207 1.505-.344 1.858a3.1 3.1 0 01-.748 1.15c-.35.35-.683.567-1.15.748-.353.137-.882.3-1.858.344-1.054.049-1.371.059-4.042.059s-2.987-.01-4.042-.059c-.976-.045-1.505-.207-1.858-.344a3.1 3.1 0 01-1.15-.748 3.1 3.1 0 01-.748-1.15c-.137-.353-.3-.882-.344-1.858-.048-1.055-.059-1.372-.059-4.042s.01-2.987.059-4.042c.045-.976.207-1.505.344-1.858.181-.467.398-.8.748-1.15.35-.35.683-.567 1.15-.748.353-.137.882-.3 1.858-.344C9.013 3.812 9.33 3.802 12 3.802zm0 3.064a5.134 5.134 0 100 10.268A5.134 5.134 0 0012 6.866zm0 8.468a3.334 3.334 0 110-6.668 3.334 3.334 0 010 6.668zm6.538-8.671a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/>
-                    </svg>
-                    <span class="text-xs text-plum-500">Instagram</span>
-                </a>
-            </div>
-
-            <a :href="mapsUrl" target="_blank" rel="noopener" class="flex items-center justify-center gap-3 bg-white/80 border border-gold-200/60 rounded-2xl py-4 px-4 mb-8 hover:border-gold-400 transition-colors">
-                <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                </svg>
-                <span class="text-left">
-                    <span class="block text-sm text-plum-500">Home Base: Paliparan 2, Dasmariñas, Cavite</span>
-                    <span class="block text-xs text-plum-400">Open in Google Maps</span>
-                </span>
-            </a>
-
-            <div class="bg-rose-50 border border-gold-200/60 rounded-2xl px-5 py-4">
-                <p class="text-sm text-rose-600 font-medium" x-text="$store.site.lang === 'en' ? '💕 Refer a friend, get ₱20 off!' : '💕 Mag-refer ng kaibigan, ₱20 discount!'"></p>
-                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱20 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱20 off sa susunod mong set.'"></p>
-            </div>
-        </section>
 
         <!-- ============ PRICE CALCULATOR (Jen's tool) ============ -->
         <section id="calculator" class="reveal mt-16 scroll-mt-24">
@@ -1211,6 +1182,44 @@
                  @click="photoViewer.open = false" @keydown.window.escape="photoViewer.open = false">
                 <button type="button" @click="photoViewer.open = false" aria-label="Close photo" class="absolute top-5 right-5 text-white/80 hover:text-white text-3xl leading-none">&times;</button>
                 <img :src="photoViewer.src" alt="Client's nails" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
+            </div>
+        </section>
+
+        <!-- ============ CONTACT ============ -->
+        <section id="contact" class="reveal mt-16 max-w-md mx-auto text-center scroll-mt-24">
+            <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+            <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Get in touch' : 'Makipag-ugnayan'"></p>
+            <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600 mb-6" x-text="$store.site.lang === 'en' ? 'Say hi' : 'Kumusta'"></h2>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <a :href="plainMessengerLink" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
+                    <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.02 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.196 2.238.196v2.459h-1.26c-1.243 0-1.63.771-1.63 1.562v1.877h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.92 8.437-9.94z"/>
+                    </svg>
+                    <span class="text-xs text-plum-500">Messenger</span>
+                </a>
+                <a href="https://www.instagram.com/nailsbyjen.ph" target="_blank" class="flex flex-col items-center gap-2 bg-white/80 border border-gold-200/60 rounded-2xl py-4 hover:border-gold-400 transition-colors">
+                    <svg class="w-6 h-6 text-rose-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2c-2.716 0-3.056.012-4.123.06-1.064.05-1.79.218-2.427.465a4.9 4.9 0 00-1.772 1.153A4.9 4.9 0 002.525 5.45c-.247.637-.416 1.363-.465 2.427C2.012 8.944 2 9.284 2 12s.012 3.056.06 4.123c.05 1.064.218 1.79.465 2.427a4.9 4.9 0 001.153 1.772 4.9 4.9 0 001.772 1.153c.637.247 1.363.416 2.427.465C8.944 21.988 9.284 22 12 22s3.056-.012 4.123-.06c1.064-.05 1.79-.218 2.427-.465a4.9 4.9 0 001.772-1.153 4.9 4.9 0 001.153-1.772c.247-.637.416-1.363.465-2.427.048-1.067.06-1.407.06-4.123s-.012-3.056-.06-4.123c-.05-1.064-.218-1.79-.465-2.427a4.9 4.9 0 00-1.153-1.772A4.9 4.9 0 0018.55 2.525c-.637-.247-1.363-.416-2.427-.465C15.056 2.012 14.716 2 12 2zm0 1.802c2.67 0 2.987.01 4.042.059.976.045 1.505.207 1.858.344.467.181.8.398 1.15.748.35.35.567.683.748 1.15.137.353.3.882.344 1.858.049 1.055.059 1.372.059 4.042s-.01 2.987-.059 4.042c-.045.976-.207 1.505-.344 1.858a3.1 3.1 0 01-.748 1.15c-.35.35-.683.567-1.15.748-.353.137-.882.3-1.858.344-1.054.049-1.371.059-4.042.059s-2.987-.01-4.042-.059c-.976-.045-1.505-.207-1.858-.344a3.1 3.1 0 01-1.15-.748 3.1 3.1 0 01-.748-1.15c-.137-.353-.3-.882-.344-1.858-.048-1.055-.059-1.372-.059-4.042s.01-2.987.059-4.042c.045-.976.207-1.505.344-1.858.181-.467.398-.8.748-1.15.35-.35.683-.567 1.15-.748.353-.137.882-.3 1.858-.344C9.013 3.812 9.33 3.802 12 3.802zm0 3.064a5.134 5.134 0 100 10.268A5.134 5.134 0 0012 6.866zm0 8.468a3.334 3.334 0 110-6.668 3.334 3.334 0 010 6.668zm6.538-8.671a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/>
+                    </svg>
+                    <span class="text-xs text-plum-500">Instagram</span>
+                </a>
+            </div>
+
+            <a :href="mapsUrl" target="_blank" rel="noopener" class="flex items-center justify-center gap-3 bg-white/80 border border-gold-200/60 rounded-2xl py-4 px-4 mb-8 hover:border-gold-400 transition-colors">
+                <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <span class="text-left">
+                    <span class="block text-sm text-plum-500">Home Base: Paliparan 2, Dasmariñas, Cavite</span>
+                    <span class="block text-xs text-plum-400">Open in Google Maps</span>
+                </span>
+            </a>
+
+            <div class="bg-rose-50 border border-gold-200/60 rounded-2xl px-5 py-4">
+                <p class="text-sm text-rose-600 font-medium" x-text="$store.site.lang === 'en' ? '💕 Refer a friend, get ₱20 off!' : '💕 Mag-refer ng kaibigan, ₱20 discount!'"></p>
+                <p class="text-xs text-plum-400 mt-1" x-text="$store.site.lang === 'en' ? 'Tell Jen who referred you when you book, and get ₱20 off your next set.' : 'Sabihin kay Jen kung sino ang nag-refer sa\u2019yo kapag nag-book ka, para makakuha ng ₱20 off sa susunod mong set.'"></p>
             </div>
         </section>
 

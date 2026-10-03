@@ -278,6 +278,31 @@
             .logo-shimmer, .pulse-dot, .glam-button::after, .glam-divider, .logo-halo { animation: none; transition: none; }
             .reveal { opacity: 1; transform: none; transition: none; }
         }
+
+        /* ===== FULL-SCREEN DESKTOP (v3) ===== */
+        @media (min-width: 1024px) {
+            /* everything is rem-based, so scaling the root makes the whole page fill big screens */
+            html { font-size: clamp(16px, 0.86vw, 18px); }
+            body > header > div, main { max-width: 100rem !important; margin-left: auto; margin-right: auto; width: 100%; padding-left: clamp(1.5rem, 3vw, 4rem) !important; padding-right: clamp(1.5rem, 3vw, 4rem) !important; }
+            main section, main #book { max-width: none !important; }
+            main section.lg\:sticky { top: 6rem !important; }
+            #contact { max-width: 46rem !important; margin-left: auto; margin-right: auto; }
+            #prices > div.glam-card > p { grid-column: 1 / -1; }
+            /* gallery: 12 columns, every 7th photo is a 2x2 feature tile. 33 photos = 5 big + 28 small = 48 cells = 12 x 4, no gaps */
+            .gallery-grid { grid-template-columns: repeat(12, 1fr) !important; grid-auto-flow: dense; gap: .6rem !important; }
+            .gallery-grid button:nth-of-type(9n+1) { grid-column: auto; grid-row: auto; }
+            .gallery-grid button:nth-of-type(7n+1) { grid-column: span 2; grid-row: span 2; }
+        }
+        @media (min-width: 1280px) {
+            #prices > div.glam-card { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        /* headings: Tailwind's .font-serif outranked the script style, so raise specificity */
+        main section h2.font-serif, #book h2.font-serif {
+            font-family: 'Alex Brush', cursive; font-weight: 400; line-height: 1.1;
+            font-size: clamp(2.3rem, 3.4vw, 3rem);
+            background: linear-gradient(90deg, #c22e51, #c2953a 55%, #c22e51);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
     </style>
 </head>
 <body class="min-h-screen text-plum-800" x-data="bookingPage()">
@@ -393,10 +418,7 @@
                 <a href="#book" class="glam-button inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white text-sm font-medium tracking-wide px-7 py-3.5 rounded-full shadow-glam hover:shadow-glamHover transition-shadow" x-text="$store.site.lang === 'en' ? 'Book your set' : 'Mag-book na'"></a>
                 <a href="#gallery" class="inline-flex items-center gap-2 bg-white/80 border border-gold-300 text-rose-600 text-sm font-medium px-7 py-3.5 rounded-full hover:bg-gold-50 transition-colors" x-text="$store.site.lang === 'en' ? 'See my work' : 'Tingnan ang gawa ko'"></a>
             </div>
-            <ul class="mt-6 flex flex-wrap justify-center gap-2 text-xs text-plum-600">
-                <li class="chip">Softgel extensions</li><li class="chip">Gel polish</li><li class="chip">Nail art</li>
-                <li class="chip">Home Service</li><li class="chip">Home Base · Paliparan 2</li>
-            </ul>
+            
         </section>
 
         </div>
@@ -411,7 +433,7 @@
             </div>
             <!-- To add more photos later: drop the image file into the images/ folder and add
                  another entry to the galleryImages array in the script at the bottom of this file. -->
-            <div class="gallery-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-11 gap-3 lg:gap-2.5">
+            <div class="gallery-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 <template x-for="(img, idx) in galleryImages" :key="img">
                     <button type="button" @click="lightboxIndex = idx" class="aspect-square rounded-[1.5rem] lg:rounded-2xl overflow-hidden border border-gold-200/60 shadow-sm group transition-all duration-300 hover:shadow-glamHover hover:-translate-y-1 hover:ring-2 hover:ring-gold-300">
                         <img :src="img" :alt="'Nail set by Jen, photo ' + (idx + 1)" loading="lazy"

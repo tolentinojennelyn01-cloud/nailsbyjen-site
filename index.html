@@ -346,7 +346,7 @@ async function makeCard(W,H,maxDays){
   const lab=N===1?mn(ws).slice(0,3)+" "+ws.getDate()+", "+ws.getFullYear():(mn(ws)===mn(we)?mn(ws)+" "+ws.getDate()+" – "+we.getDate():mn(ws).slice(0,3)+" "+ws.getDate()+" – "+mn(we).slice(0,3)+" "+we.getDate())+", "+we.getFullYear();
   brandBg(x,W,H); x.textBaseline="alphabetic"; x.textAlign="center";
   /* header: brand script, glam divider, date range, title */
-  const bw=scriptText(x,CONFIG.studio,W/2,tall?162:118,tall?96:72,tall?540:430);
+  const bw=scriptText(x,CONFIG.studio,W/2,tall?162:112,tall?96:50,tall?540:300);
   spark4(x,W/2-bw/2-56,tall?108:80,tall?26:20,BR.gold2); spark4(x,W/2-bw/2-16,tall?64:46,11,"#e0bf70"); spark4(x,W/2+bw/2+56,tall?108:80,tall?26:20,BR.gold2); spark4(x,W/2+bw/2+16,tall?64:46,11,"#e0bf70");
   brandDivider(x,W/2,tall?204:150,210);
   const fs=tall?26:22, ph2=tall?58:48, py2=tall?232:168; x.font="500 "+fs+"px "+SF; sp(x,6); const pw2=x.measureText(lab).width+84;

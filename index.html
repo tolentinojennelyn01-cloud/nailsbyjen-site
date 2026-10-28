@@ -2706,5 +2706,6 @@ ${r?'Expression: "'+r+`"
             revealEls.forEach(el => observer.observe(el));
         });
     </script>
+<script>if("serviceWorker" in navigator&&/^https?:/.test(location.protocol))addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});</script>
 </body>
 </html>

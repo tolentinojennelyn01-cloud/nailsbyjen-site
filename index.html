@@ -334,6 +334,22 @@
         .cal-days button[data-off="true"].bg-rose-600 { background: #8a4d68 !important; color: #fff !important; box-shadow: none; }
         .lg-off { background: repeating-linear-gradient(135deg, #f3eef0, #f3eef0 3px, #e2d7db 3px, #e2d7db 6px); border: 1px dashed #cdbcc4; }
         .cal-off-note { background: #f7f0f3; border: 1px dashed #b88aa0; border-left: 3px solid #8a4d68; border-radius: .7rem; padding: .7rem .9rem; color: #5c2740; font-size: .85rem; }
+
+        /* ---------- Lasting Power (nail retention photos) ---------- */
+        .ret-wrap { display: grid; gap: 1rem; justify-content: center; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 420px)); }
+        .ret-card { background: rgba(255,255,255,.88); border: 1px solid rgba(224,191,112,.6); border-radius: 1.5rem; padding: .7rem; box-shadow: 0 10px 26px -14px rgba(194,46,81,.45); transition: box-shadow .3s; }
+        .ret-card:hover { box-shadow: 0 14px 30px -10px rgba(194,46,81,.45), 0 2px 12px -4px rgba(212,171,77,.45); }
+        .ret-pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+        .ret-ph { position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: 1.1rem; overflow: hidden; aspect-ratio: 4 / 5; background: #fdf2f4; cursor: zoom-in; }
+        .ret-single .ret-ph { aspect-ratio: 1 / 1; }
+        .ret-ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+        .ret-ph:hover img { transform: scale(1.06); }
+        .ret-tag { position: absolute; left: .5rem; bottom: .5rem; background: rgba(255,255,255,.93); color: #8a2a4a; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; padding: .22rem .65rem; border-radius: 999px; border: 1px solid rgba(212,171,77,.6); }
+        .ret-tag.after { background: linear-gradient(135deg, #df4d6e, #c2953a); color: #fff; border-color: transparent; }
+        .ret-cap { text-align: center; padding: .75rem .4rem .35rem; }
+        .ret-lb { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.82); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .ret-lb img { max-height: 86vh; max-width: 100%; border-radius: .9rem; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+        .ret-lb button { position: absolute; top: 1rem; right: 1.2rem; color: rgba(255,255,255,.85); font-size: 2rem; line-height: 1; background: none; border: 0; cursor: pointer; }
     </style>
 </head>
 <body class="min-h-screen text-plum-800" x-data="bookingPage()">
@@ -349,6 +365,7 @@
                 <a href="#book" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors" x-text="$store.site.lang === 'en' ? 'Book' : 'Mag-book'"></a>
                 <a href="#about" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors" x-text="$store.site.lang === 'en' ? 'About' : 'Tungkol'"></a>
                 <a href="#gallery" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors" x-text="$store.site.lang === 'en' ? 'Gallery' : 'Gallery'"></a>
+                <a href="#lasting" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors" x-show="retentionSets.some(s => !s.broken)" x-cloak x-text="$store.site.lang === 'en' ? 'Lasting' : 'Tumatagal'"></a>
                 <a href="#faq" class="hidden sm:inline text-plum-400 hover:text-rose-600 transition-colors" x-text="$store.site.lang === 'en' ? 'FAQ' : 'Tanong'"></a>
                 <a href="https://www.facebook.com/profile.php?id=61593421694869" target="_blank" aria-label="Nails by Jen on Facebook" class="text-rose-500 hover:text-rose-600 transition-colors" title="Facebook">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -487,6 +504,49 @@
                 <img :src="galleryImages[lightboxIndex]" alt="Enlarged nail set photo" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl">
                 <button type="button" @click.stop="lightboxIndex = (lightboxIndex + 1) % galleryImages.length"
                         aria-label="Next photo" class="absolute right-3 sm:right-8 text-white/70 hover:text-white text-4xl leading-none select-none">&#8250;</button>
+            </div>
+        </section>
+
+        <!-- ============ LASTING POWER (nail retention photos) ============
+             Hidden until you add photos. Add yours in the retentionSets list in the script at the bottom of this file.
+             Preview the design with sample pictures: open the site with  ?preview=lasting  at the end of the address. -->
+        <section id="lasting" class="reveal mb-14 scroll-mt-24" x-show="retentionSets.some(s => !s.broken)" x-cloak>
+            <div class="text-center mb-6">
+                <div class="max-w-[6rem] mx-auto glam-divider text-gold-500 text-xs mb-3">✦</div>
+                <p class="text-[11px] uppercase tracking-[0.25em] text-gold-600 mb-1" x-text="$store.site.lang === 'en' ? 'Built to last' : 'Matibay ang gawa'"></p>
+                <h2 class="text-2xl sm:text-3xl font-serif font-semibold text-rose-600" x-text="$store.site.lang === 'en' ? 'Lasting Power' : 'Tumatagal ang gawa'"></h2>
+                <p class="text-sm text-plum-400 mt-2" x-text="$store.site.lang === 'en' ? 'My clients\' real nails, weeks after their set.' : 'Totoong kuko ng mga client ko, ilang linggo na matapos ang set.'"></p>
+            </div>
+            <div class="ret-wrap">
+                <template x-for="(s, i) in retentionSets" :key="i">
+                    <div class="ret-card" :class="s.before ? '' : 'ret-single'" x-show="!s.broken">
+                        <div :class="s.before ? 'ret-pair' : ''">
+                            <template x-if="s.before">
+                                <button type="button" class="ret-ph" @click="retentionLightbox = s.before">
+                                    <img :src="s.before" :alt="$store.site.lang === 'en' ? 'Nails on the first day' : 'Kuko sa unang araw'" loading="lazy" @error="s.before = null">
+                                    <span class="ret-tag" x-text="$store.site.lang === 'en' ? 'Day 1' : 'Unang araw'"></span>
+                                </button>
+                            </template>
+                            <button type="button" class="ret-ph" @click="retentionLightbox = s.after">
+                                <img :src="s.after" :alt="retTitle(s)" loading="lazy" @error="s.broken = true">
+                                <span class="ret-tag after" x-text="s.weeks ? ($store.site.lang === 'en' ? ('Week ' + s.weeks) : ('Linggo ' + s.weeks)) : ($store.site.lang === 'en' ? 'Later' : 'Pagkatapos')"></span>
+                            </button>
+                        </div>
+                        <div class="ret-cap">
+                            <p class="font-serif font-semibold text-rose-600 text-base" x-text="retTitle(s)"></p>
+                            <p class="text-xs text-plum-400 mt-0.5" x-show="s.noteEn || s.noteTl" x-text="$store.site.lang === 'en' ? s.noteEn : (s.noteTl || s.noteEn)"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <p class="text-center text-xs text-plum-400 mt-5" x-text="$store.site.lang === 'en' ? 'Results vary depending on lifestyle and aftercare.' : 'Iba-iba ang resulta depende sa pangangalaga.'"></p>
+            <div class="mt-4 text-center">
+                <a href="#book" class="glam-button inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 via-rose-600 to-gold-500 text-white text-sm font-medium tracking-wide px-7 py-3.5 rounded-full shadow-glam" x-text="$store.site.lang === 'en' ? 'Book your set' : 'Mag-book ng set'"></a>
+            </div>
+            <div class="ret-lb" x-show="retentionLightbox" x-cloak role="dialog" aria-modal="true" aria-label="Nail photo viewer"
+                 @click.self="retentionLightbox = null" @keydown.window.escape="retentionLightbox = null">
+                <button type="button" @click="retentionLightbox = null" aria-label="Close photo viewer">&times;</button>
+                <img :src="retentionLightbox" alt="Enlarged nail photo">
             </div>
         </section>
 
@@ -1575,6 +1635,34 @@
             };
         }
 
+        /* turns the easy format into photo paths:  set: 19  ->  images/nail-set-19.jpg ;  after: 'lasting-1.jpg'  ->  images/lasting-1.jpg */
+        function retNorm(s) {
+            const p = v => v == null || v === '' ? null : (typeof v === 'number' ? 'images/nail-set-' + v + '.jpg' : (/[\/:]/.test(v) ? v : 'images/' + v));
+            return Object.assign({}, s, { before: p(s.set != null ? s.set : s.before), after: p(s.after), broken: false });
+        }
+        /* sample pictures, only shown with ?preview=lasting so you can see the design before adding your own photos */
+        function demoNail(grown) {
+            const xs = [58, 158, 258, 358, 458], hs = grown ? [300, 350, 360, 330, 250] : [210, 250, 260, 235, 180];
+            let n = '';
+            xs.forEach((x, i) => {
+                const h = hs[i], y = 640 - h;
+                n += '<rect x="' + (x - 8) + '" y="560" width="96" height="200" rx="40" fill="#f1c9b8"/>';
+                n += '<rect x="' + x + '" y="' + y + '" width="80" height="' + h + '" rx="40" fill="#e0719a"/>';
+                n += '<rect x="' + (x + 12) + '" y="' + (y + 14) + '" width="14" height="' + (h * 0.45) + '" rx="7" fill="#fff" opacity=".35"/>';
+                if (grown) n += '<rect x="' + x + '" y="590" width="80" height="55" rx="26" fill="#f3d9cc"/>';
+            });
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdf2f4"/><stop offset="1" stop-color="#f9c9d1"/></linearGradient></defs><rect width="600" height="750" fill="url(#g)"/>' + n +
+                '<text x="300" y="70" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="#8a4d68" opacity=".7">SAMPLE PHOTO</text></svg>';
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+        function demoRetentionSets() {
+            return [
+                { before: demoNail(false), after: demoNail(true), weeks: 4, noteEn: 'No lifting, no chips', noteTl: 'Walang natanggal, walang chip' },
+                { after: demoNail(true), weeks: 3, noteEn: 'Still glossy and secure', noteTl: 'Makintab at matibay pa rin' },
+                { before: demoNail(false), after: demoNail(true), weeks: 5, noteEn: 'Grown out, still intact', noteTl: 'Humaba na, buo pa rin' }
+            ];
+        }
+
         function bookingPage() {
             return {
                 pricing,
@@ -1640,6 +1728,24 @@
                 },
                 bookingConflictMessage: '',
                 savingBooking: false,
+                /* LASTING POWER photos. One line per client:
+                     { set: 19, after: 'lasting-1.jpg', weeks: 4 },
+                   set   = the number of the client's first set in your Gallery (nail-set-19.jpg -> 19). Leave it out if you have no before photo.
+                   after = file name of the later photo you upload to the images folder.
+                   weeks = optional. Only write it if you are sure how long the set lasted.
+                   A line whose photo is not uploaded yet simply stays hidden. Add ?preview=lasting to the site address to see sample pictures. */
+                retentionLightbox: null,
+                retentionSets: ((new URLSearchParams(location.search).get('preview') === 'lasting') ? demoRetentionSets() : [
+                    { set: 19, after: 'lasting-1.jpg' },
+                    { set: 16, after: 'lasting-2.jpg' },
+                    { set: 7, after: 'lasting-3.jpg' },
+                    { set: 9, after: 'lasting-4.jpg' },
+                ]).map(retNorm),
+                retTitle(s) {
+                    const w = s.weeks, en = this.$store.site.lang === 'en';
+                    if (!w) return en ? 'Weeks later, still strong' : 'Ilang linggo na, matibay pa rin';
+                    return en ? (w + (w === 1 ? ' week' : ' weeks') + ', still strong') : (w + ' linggo na, matibay pa rin');
+                },
                 lightboxIndex: null,
                 galleryImages: [
                     'images/nail-set-1.jpg', 'images/nail-set-2.jpg', 'images/nail-set-3.jpg',
